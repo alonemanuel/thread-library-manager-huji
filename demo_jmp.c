@@ -65,7 +65,7 @@ void switchThreads(void)
   int ret_val = sigsetjmp(env[currentThread],1);
   printf("SWITCH: ret_val=%d\n", ret_val); 
   if (ret_val == 1) {
-      return;
+    return;
   }
   currentThread = 1 - currentThread;
   siglongjmp(env[currentThread],1);

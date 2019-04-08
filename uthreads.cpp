@@ -1,22 +1,24 @@
-//
-// Created by kalir on 27/03/2019.
-//
 
 #include "uthreads.h"
 #include "thread.h"
 #include <list>
 #include <unordered_map>
 
+#include <stdio.h>
+#include <signal.h>
+#include <sys/time.h>
+
 // Constants //
 
 
 // Variables //
-int quantum;
+int quantum, total_quantums;
 std::unordered_map<int, Thread> threads;
-std::list<Thread> ready_threads;
+std::list <Thread> ready_threads;
 Thread running_thread; //TODO: figure this out
-std::list<Thread> blocked_threads;
-std::unordered_map<int, std::list<Thread>> thread_states = {{READY, ready_threads}, {BLOCKED, blocked_threads}};
+std::list <Thread> blocked_threads;
+std::unordered_map<int, std::list<Thread>> thread_states = {{READY,   ready_threads},
+															{BLOCKED, blocked_threads}};
 
 
 /*
@@ -27,9 +29,13 @@ std::unordered_map<int, std::list<Thread>> thread_states = {{READY, ready_thread
  * function with non-positive quantum_usecs.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_init(int quantum_usecs){
-    quantum = quantum_usecs; // TODO: return value
-    return 0;
+int uthread_init(int quantum_usecs)
+{
+	quantum = quantum_usecs; // TODO: return value
+	total_quantums = 1; // TODO: is 1 because of the pre existing main thread
+
+	// TODO create main thread (possibly in the ctor)
+	return 0;
 }
 
 /*
@@ -42,14 +48,16 @@ int uthread_init(int quantum_usecs){
  * Return value: On success, return the ID of the created thread.
  * On failure, return -1.
 */
-int uthread_spawn(void (*f)(void)){
-    if(ready_threads.size() == MAX_THREAD_NUM){
-        return -1; // TODO: error msg? constant?
-    }
-    Thread new_thread(f);
-    threads[new_thread.get_id()] = new_thread;
-    ready_threads.push_back(new_thread);
-    return new_thread.get_id();
+int uthread_spawn(void (*f)(void))
+{
+	if (ready_threads.size() == MAX_THREAD_NUM)
+	{
+		return -1; // TODO: error msg? constant?
+	}
+	Thread new_thread(f);
+	threads[new_thread.get_id()] = new_thread;
+	ready_threads.push_back(new_thread);
+	return new_thread.get_id();
 }
 
 
@@ -64,15 +72,21 @@ int uthread_spawn(void (*f)(void)){
  * terminated and -1 otherwise. If a thread terminates itself or the main
  * thread is terminated, the function does not return.
 */
-int uthread_terminate(int tid){ //TODO: consider an error
-    if(threads.find(tid) == threads.end()){
-        return -1;
-    }
-    Thread curr_thread = threads[tid];
-    int state = curr_thread.get_state();
-    std::list<Thread> curr_state_lst = thread_states[state];
-    curr_state_lst.remove(curr_thread);
-    threads.erase(tid);
+int uthread_terminate(int tid)
+{ //TODO: consider an error
+	if (threads.find(tid) == threads.end())
+	{
+		return -1;
+	}
+	Thread curr_thread = threads[tid];
+	int state = curr_thread.get_state();
+	std::list <Thread> curr_state_lst = thread_states[state];
+	curr_state_lst.remove(curr_thread);
+	threads.erase(tid);
+	delete curr_thread;
+
+
+	ready_to_running();
 }
 
 
@@ -85,15 +99,16 @@ int uthread_terminate(int tid){ //TODO: consider an error
  * effect and is not considered an error.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_block(int tid){
-    if(tid == 0 || threads.find(tid) == threads.end()){
-        return -1;
-    }
-    //TODO: understand the algorithm
-    threads[tid].set_state(BLOCKED);
-    return 0;
+int uthread_block(int tid)
+{
+	if (tid == 0 || threads.find(tid) == threads.end())
+	{
+		return -1;
+	}
+	//TODO: understand the algorithm
+	threads[tid].set_state(BLOCKED);
+	return 0;
 }
-
 
 
 /*
@@ -103,15 +118,18 @@ int uthread_block(int tid){
  * ID tid exists it is considered an error.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_resume(int tid){
-    if(threads.find(tid) == threads.end()){
-        return -1;
-    }
-    Thread curr_thread = threads[tid];
-    if(curr_thread.get_state() == BLOCKED){
-        blocked_threads.remove(curr_thread);
-    }
-    return 0;
+int uthread_resume(int tid)
+{
+	if (threads.find(tid) == threads.end())
+	{
+		return -1;
+	}
+	Thread curr_thread = threads[tid];
+	if (curr_thread.get_state() == BLOCKED)
+	{
+		blocked_threads.remove(curr_thread);
+	}
+	return 0;
 }
 
 
@@ -122,11 +140,13 @@ int uthread_resume(int tid){
  * should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sleep(int usec){
-    if(running_thread.get_id() == 0){
-        return -1;
-    }
-    //TODO: what to do with the usec?
+int uthread_sleep(int usec)
+{
+	if (running_thread.get_id() == 0)
+	{
+		return -1;
+	}
+	//TODO: what to do with the usec?
 }
 
 
@@ -134,7 +154,11 @@ int uthread_sleep(int usec){
  * Description: This function returns the thread ID of the calling thread.
  * Return value: The ID of the calling thread.
 */
-int uthread_get_tid();
+int uthread_get_tid()
+{
+	// TODO: is this right? (is the calling thread == running thread?)
+	return running_thread.get_id();
+}
 
 
 /*
@@ -145,7 +169,10 @@ int uthread_get_tid();
  * should be increased by 1.
  * Return value: The total number of quantums.
 */
-int uthread_get_total_quantums();
+int uthread_get_total_quantums()
+{
+	return total_quantums;
+}
 
 
 /*
@@ -158,10 +185,45 @@ int uthread_get_total_quantums();
  * Return value: On success, return the number of quantums of the thread with ID tid.
  * 			     On failure, return -1.
 */
-int uthread_get_quantums(int tid);
+int uthread_get_quantums(int tid)
+{
+	// check for non existing tid
+	if (threads.find(tid) == threads.end())
+	{
+		return -1;
+	}
+	return threads[tid].get_quantums();
+}
 
-void add_to_list(int id, int state){
-    Thread curr_thread = threads[id];
-    std::list<Thread> curr_state_lst = thread_states[state];
-    curr_state_lst.remove(curr_thread);
+void add_to_list(int id, int state)
+{
+	Thread curr_thread = threads[id];
+	std::list <Thread> curr_state_lst = thread_states[state];
+	curr_state_lst.remove(curr_thread);
+}
+
+
+/** Handlers */
+void quantum_handler(int sig)
+{
+	// assuming sig = SIGVALRM
+	sigsetjmp(running_thread.env[0], 1);
+	ready_to_running();
+}
+
+/**
+ * @brief make the front of the ready threads list the current running thread.
+ */
+void ready_to_running()
+{
+	// pop the topmost ready thread to be the running thread
+	running_thread = ready_threads.front();
+	ready_threads.pop_front();
+	// jump to the running thread's last state
+	siglongjmp(running_thread.env[0], 1);
+
+	// TODO: maybe move this to the general case of a thread starting a run
+	// increase thread's quantum counter
+	running_thread.increase_quantums();
+	total_quantums++;
 }

@@ -1,20 +1,14 @@
-/*
- * Interval-timer demo program.
- * Hebrew University OS course.
- * Author: OS, os@cs.huji.ac.il
- */
+
 
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
+#include "uthreads.h"
 
-
-int gotit = 0;
-
-void timer_handler(int sig)
+void quantum_handler(int sig)
 {
-	gotit = 1;
-	printf("Timer expired\n");
+	// assuming sig = SIGVALRM
+	sigsetjmp(running_thread, 1);
 }
 
 
