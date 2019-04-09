@@ -11,10 +11,10 @@
 #include "sleeping_threads_list.h"
 
 // Constants //
-
-
 // Variables //
 int total_quantums;
+
+
 std::unordered_map<int, Thread> threads;
 std::list <Thread> ready_threads;
 Thread running_thread;
@@ -22,6 +22,27 @@ SleepingThreadsList sleeping_threads;
 struct itimerval quantum_timer, sleep_timer;
 struct sigaction quantum_sa, sleep_sa;
 
+
+bool does_exist(std::list<Thread> lst, int tid){
+	for(std::list<Thread>::iterator it = lst.begin(); it != lst.end(); ++it){
+		if (it->get_id() == tid){
+			return true;
+		}
+	}
+	return false;
+}
+
+
+timeval calc_wake_up_timeval(int usecs_to_sleep)
+{
+
+	timeval now, time_to_sleep, wake_up_timeval;
+	gettimeofday(&now, nullptr);
+	time_to_sleep.tv_sec = usecs_to_sleep / 1000000;
+	time_to_sleep.tv_usec = usecs_to_sleep % 1000000;
+	timeradd(&now, &time_to_sleep, &wake_up_timeval);
+	return wake_up_timeval;
+}
 
 /**
  * @brief make the front of the ready threads list the current running thread.
@@ -31,21 +52,37 @@ int ready_to_running()
     // pop the topmost ready thread to be the running thread
     running_thread = ready_threads.front();
     ready_threads.pop_front();
-    // jump to the running thread's last state
-    siglongjmp(running_thread.env[0], 1);
 
-    // TODO: maybe move this to the general case of a thread starting a run
-    // increase thread's quantum counter
-    running_thread.increase_quantums();
-    total_quantums++;
+	// TODO: maybe move this to the general case of a thread starting a run
+	// increase thread's quantum counter
+	running_thread.increase_quantums();
+	total_quantums++;
 
-    // start timer for the running thread
+	// start timer for the running thread
 
-    if (setitimer(ITIMER_VIRTUAL, &timer, NULL))
+	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
     {
-        // TODO: print error
-        return -1;    // TODO: bubble up error
-    }
+		// TODO: print error
+		return -1;    // TODO: bubble up error
+	}
+	// jump to the running thread's last state
+	siglongjmp(running_thread.env[0], 1);
+}
+
+/** Handlers */
+void quantum_handler(int sig)
+{
+	// assuming sig = SIGVTALRM
+	sigsetjmp(running_thread.env[0], 1);
+	ready_to_running();
+}
+
+
+void sleep_handler(int sig)
+{
+	// assuming sig = SIGALRM
+	uthread_resume(sleeping_threads.peek()->id);
+	sleeping_threads.pop();
 }
 
 
@@ -75,7 +112,7 @@ int uthread_init(int quantum_usecs)
 	sleep_timer.it_value.tv_sec = 0;
 	sleep_timer.it_value.tv_usec = 0;
 	sleep_sa.sa_handler = &sleep_handler;
-	if (sigaction(SIGALRM, &sleep_handler, NULL) < 0)
+	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
 	{
 		// TODO: print error
 		return -1;
@@ -84,6 +121,7 @@ int uthread_init(int quantum_usecs)
 	// TODO create main thread (possibly in the ctor)
 	return 0;
 }
+
 
 /*
  * Description: This function creates a new thread, whose entry point is the
@@ -129,7 +167,7 @@ int uthread_terminate(int tid)
 	{
 		ready_to_running();
 	}
-	else if (ready_threads.find(tid) != ready_threads.end())
+	else if (does_exist(ready_threads, tid) )
 	{
 		ready_threads.remove(threads[tid]);
 	}
@@ -154,7 +192,7 @@ int uthread_block(int tid)
 		return -1;
 	}
 	// if thread is the running thread, run the next ready thread
-	if (threads[tid] == running_thread)
+	if (&threads[tid] == &running_thread)
 	{
 		ready_to_running();
 	}
@@ -177,7 +215,7 @@ int uthread_resume(int tid)
 	}
 	Thread curr_thread = threads[tid];
 	// if thread to resume is not running or already ready
-	if ((ready_threads.find(tid) != ready_threads.end()) && (running_thread.get_id() != tid)
+	if (does_exist(ready_threads, tid) && (running_thread.get_id() != tid))
 	{
 		ready_threads.push_back(curr_thread);
 	}
@@ -222,7 +260,6 @@ int uthread_get_tid()
 	return running_thread.get_id();
 }
 
-
 /*
  * Description: This function returns the total number of quantums since
  * the library was initialized, including the current quantum.
@@ -235,7 +272,6 @@ int uthread_get_total_quantums()
 {
 	return total_quantums;
 }
-
 
 /*
  * Description: This function returns the number of quantums the thread with
@@ -255,31 +291,4 @@ int uthread_get_quantums(int tid)
 		return -1;
 	}
 	return threads[tid].get_quantums();
-}
-
-
-/** Handlers */
-void quantum_handler(int sig)
-{
-	// assuming sig = SIGVTALRM
-	sigsetjmp(running_thread.env[0], 1);
-	ready_to_running();
-}
-
-void sleep_handler(int sig)
-{
-	// assuming sig = SIGALRM
-	uthread_resume(sleeping_threads.peek()->id);
-	sleeping_threads.pop();
-}
-
-timeval calc_wake_up_timeval(int usecs_to_sleep)
-{
-
-	timeval now, time_to_sleep, wake_up_timeval;
-	gettimeofday(&now, nullptr);
-	time_to_sleep.tv_sec = usecs_to_sleep / 1000000;
-	time_to_sleep.tv_usec = usecs_to_sleep % 1000000;
-	timeradd(&now, &time_to_sleep, &wake_up_timeval);
-	return wake_up_timeval;
 }

@@ -1,12 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.cpp.dir/uthreads.cpp.obj"
-  "CMakeFiles/main.cpp.dir/thread.cpp.obj"
-  "CMakeFiles/main.cpp.dir/handler.cpp.obj"
-  "CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.obj"
+  "CMakeFiles/main.cpp.dir/uthreads.cpp.o"
+  "CMakeFiles/main.cpp.dir/thread.cpp.o"
+  "CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.o"
   "main.cpp.pdb"
-  "main.cpp.exe"
-  "main.cpp.exe.manifest"
-  "libmain.cpp.dll.a"
+  "main.cpp"
 )
 
 # Per-language clean rules from dependency scanning.

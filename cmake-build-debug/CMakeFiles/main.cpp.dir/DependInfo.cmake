@@ -4,10 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/handler.cpp" "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/handler.cpp.obj"
-  "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/sleeping_threads_list.cpp" "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.obj"
-  "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/thread.cpp" "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/thread.cpp.obj"
-  "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/uthreads.cpp" "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/uthreads.cpp.obj"
+  "/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.o"
+  "/cs/usr/alonemanuel/OS/ex2/thread.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/thread.cpp.o"
+  "/cs/usr/alonemanuel/OS/ex2/uthreads.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/main.cpp.dir/uthreads.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

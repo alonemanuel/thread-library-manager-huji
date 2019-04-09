@@ -7,7 +7,20 @@
 
 int Thread::num_of_threads = 0;
 
-Thread::Thread(void (*f)(void) = nullptr)
+/* A translation is required when using an address of a variable.
+   Use this as a black box in your code. */
+address_t translate_address(address_t addr)
+{
+	address_t ret;
+	asm volatile("xor    %%fs:0x30,%0\n"
+				 "rol    $0x11,%0\n"
+	: "=g" (ret)
+	: "0" (addr));
+	return ret;
+}
+
+Thread::Thread(void (*f)(void)) : _state(READY), _stack_size(STACK_SIZE), _id
+		(num_of_threads), _quantums(0), func(f)
 {
 	num_of_threads++;
 
@@ -19,14 +32,7 @@ Thread::Thread(void (*f)(void) = nullptr)
 	sigemptyset(&env[0]->__saved_mask);
 }
 
-/* A translation is required when using an address of a variable.
-   Use this as a black box in your code. */
-address_t thread::translate_address(address_t addr)
-{
-	address_t ret;
-	asm volatile("xor    %%fs:0x30,%0\n"
-				 "rol    $0x11,%0\n"
-	: "=g" (ret)
-	: "0" (addr));
-	return ret;
+
+bool Thread::operator==(const Thread& other) const{
+	return _id==other.get_id();
 }

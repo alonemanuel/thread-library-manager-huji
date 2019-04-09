@@ -41,11 +41,9 @@ public:
 	sigjmp_buf env[1];
 
 
-	Thread(void (*f)(void) = nullptr) : _state(READY), _stack_size(STACK_SIZE), _id
-			(num_of_threads), _quantums(0), func(f)
-	{}
+	Thread(void (*f)(void) = nullptr);
 
-	int get_id()
+	int get_id() const
 	{ return _id; };
 
 	int get_state()
@@ -63,6 +61,8 @@ public:
 	{
 		_quantums++;
 	}
+
+	bool operator==(const Thread &other) const;
 };
 
 #endif //EX2_THREAD_H
