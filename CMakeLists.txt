@@ -3,4 +3,5 @@ project(ex2)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(ex2 main.cpp uthreads.cpp thread.h thread.cpp demo_jmp.c cmake-build-debug/thread.h handler.cpp)
+add_executable(main.cpp uthreads.cpp uthreads.h thread.h thread.cpp handler.cpp
+        sleeping_threads_list.cpp sleeping_threads_list.h)

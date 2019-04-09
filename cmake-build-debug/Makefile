@@ -47,10 +47,10 @@ RM = "C:\Program Files\JetBrains\CLion 2018.2.5\bin\cmake\win\bin\cmake.exe" -E 
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\kalir\CLionProjects\ex2
+CMAKE_SOURCE_DIR = "C:\Users\kalir\Desktop\Univ\Year 2\Semester B\OS\ex2"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\kalir\CLionProjects\ex2\cmake-build-debug
+CMAKE_BINARY_DIR = "C:\Users\kalir\Desktop\Univ\Year 2\Semester B\OS\ex2\cmake-build-debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -79,9 +79,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\kalir\CLionProjects\ex2\cmake-build-debug\CMakeFiles C:\Users\kalir\CLionProjects\ex2\cmake-build-debug\CMakeFiles\progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\kalir\Desktop\Univ\Year 2\Semester B\OS\ex2\cmake-build-debug\CMakeFiles" "C:\Users\kalir\Desktop\Univ\Year 2\Semester B\OS\ex2\cmake-build-debug\CMakeFiles\progress.marks"
 	$(MAKE) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\kalir\CLionProjects\ex2\cmake-build-debug\CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\kalir\Desktop\Univ\Year 2\Semester B\OS\ex2\cmake-build-debug\CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -110,44 +110,71 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named ex2
+# Target rules for targets named main.cpp
 
 # Build rule for target.
-ex2: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 ex2
-.PHONY : ex2
+main.cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 main.cpp
+.PHONY : main.cpp
 
 # fast build rule for target.
-ex2/fast:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/build
-.PHONY : ex2/fast
+main.cpp/fast:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/build
+.PHONY : main.cpp/fast
 
-main.obj: main.cpp.obj
+handler.obj: handler.cpp.obj
 
-.PHONY : main.obj
+.PHONY : handler.obj
 
 # target to build an object file
-main.cpp.obj:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/main.cpp.obj
-.PHONY : main.cpp.obj
+handler.cpp.obj:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/handler.cpp.obj
+.PHONY : handler.cpp.obj
 
-main.i: main.cpp.i
+handler.i: handler.cpp.i
 
-.PHONY : main.i
+.PHONY : handler.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/main.cpp.i
-.PHONY : main.cpp.i
+handler.cpp.i:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/handler.cpp.i
+.PHONY : handler.cpp.i
 
-main.s: main.cpp.s
+handler.s: handler.cpp.s
 
-.PHONY : main.s
+.PHONY : handler.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/main.cpp.s
-.PHONY : main.cpp.s
+handler.cpp.s:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/handler.cpp.s
+.PHONY : handler.cpp.s
+
+sleeping_threads_list.obj: sleeping_threads_list.cpp.obj
+
+.PHONY : sleeping_threads_list.obj
+
+# target to build an object file
+sleeping_threads_list.cpp.obj:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.obj
+.PHONY : sleeping_threads_list.cpp.obj
+
+sleeping_threads_list.i: sleeping_threads_list.cpp.i
+
+.PHONY : sleeping_threads_list.i
+
+# target to preprocess a source file
+sleeping_threads_list.cpp.i:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.i
+.PHONY : sleeping_threads_list.cpp.i
+
+sleeping_threads_list.s: sleeping_threads_list.cpp.s
+
+.PHONY : sleeping_threads_list.s
+
+# target to generate assembly for a file
+sleeping_threads_list.cpp.s:
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.s
+.PHONY : sleeping_threads_list.cpp.s
 
 thread.obj: thread.cpp.obj
 
@@ -155,7 +182,7 @@ thread.obj: thread.cpp.obj
 
 # target to build an object file
 thread.cpp.obj:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/thread.cpp.obj
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/thread.cpp.obj
 .PHONY : thread.cpp.obj
 
 thread.i: thread.cpp.i
@@ -164,7 +191,7 @@ thread.i: thread.cpp.i
 
 # target to preprocess a source file
 thread.cpp.i:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/thread.cpp.i
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/thread.cpp.i
 .PHONY : thread.cpp.i
 
 thread.s: thread.cpp.s
@@ -173,7 +200,7 @@ thread.s: thread.cpp.s
 
 # target to generate assembly for a file
 thread.cpp.s:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/thread.cpp.s
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/thread.cpp.s
 .PHONY : thread.cpp.s
 
 uthreads.obj: uthreads.cpp.obj
@@ -182,7 +209,7 @@ uthreads.obj: uthreads.cpp.obj
 
 # target to build an object file
 uthreads.cpp.obj:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/uthreads.cpp.obj
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/uthreads.cpp.obj
 .PHONY : uthreads.cpp.obj
 
 uthreads.i: uthreads.cpp.i
@@ -191,7 +218,7 @@ uthreads.i: uthreads.cpp.i
 
 # target to preprocess a source file
 uthreads.cpp.i:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/uthreads.cpp.i
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/uthreads.cpp.i
 .PHONY : uthreads.cpp.i
 
 uthreads.s: uthreads.cpp.s
@@ -200,7 +227,7 @@ uthreads.s: uthreads.cpp.s
 
 # target to generate assembly for a file
 uthreads.cpp.s:
-	$(MAKE) -f CMakeFiles\ex2.dir\build.make CMakeFiles/ex2.dir/uthreads.cpp.s
+	$(MAKE) -f CMakeFiles\main.cpp.dir\build.make CMakeFiles/main.cpp.dir/uthreads.cpp.s
 .PHONY : uthreads.cpp.s
 
 # Help Target
@@ -209,12 +236,15 @@ help:
 	@echo ... all (the default if no target is provided)
 	@echo ... clean
 	@echo ... depend
-	@echo ... ex2
+	@echo ... main.cpp
 	@echo ... edit_cache
 	@echo ... rebuild_cache
-	@echo ... main.obj
-	@echo ... main.i
-	@echo ... main.s
+	@echo ... handler.obj
+	@echo ... handler.i
+	@echo ... handler.s
+	@echo ... sleeping_threads_list.obj
+	@echo ... sleeping_threads_list.i
+	@echo ... sleeping_threads_list.s
 	@echo ... thread.obj
 	@echo ... thread.i
 	@echo ... thread.s

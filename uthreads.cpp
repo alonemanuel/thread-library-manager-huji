@@ -17,12 +17,36 @@
 int total_quantums;
 std::unordered_map<int, Thread> threads;
 std::list <Thread> ready_threads;
-Thread running_thread; //TODO: figure this out
-std::unordered_map<int, std::list<Thread>> thread_states = {{READY,   ready_threads},
-															{BLOCKED, blocked_threads}};
+Thread running_thread;
 SleepingThreadsList sleeping_threads;
 struct itimerval quantum_timer, sleep_timer;
 struct sigaction quantum_sa, sleep_sa;
+
+
+/**
+ * @brief make the front of the ready threads list the current running thread.
+ */
+int ready_to_running()
+{
+    // pop the topmost ready thread to be the running thread
+    running_thread = ready_threads.front();
+    ready_threads.pop_front();
+    // jump to the running thread's last state
+    siglongjmp(running_thread.env[0], 1);
+
+    // TODO: maybe move this to the general case of a thread starting a run
+    // increase thread's quantum counter
+    running_thread.increase_quantums();
+    total_quantums++;
+
+    // start timer for the running thread
+
+    if (setitimer(ITIMER_VIRTUAL, &timer, NULL))
+    {
+        // TODO: print error
+        return -1;    // TODO: bubble up error
+    }
+}
 
 
 /*
@@ -233,13 +257,6 @@ int uthread_get_quantums(int tid)
 	return threads[tid].get_quantums();
 }
 
-void add_to_list(int id, int state)
-{
-	Thread curr_thread = threads[id];
-	std::list <Thread> curr_state_lst = thread_states[state];
-	curr_state_lst.remove(curr_thread);
-}
-
 
 /** Handlers */
 void quantum_handler(int sig)
@@ -254,31 +271,6 @@ void sleep_handler(int sig)
 	// assuming sig = SIGALRM
 	uthread_resume(sleeping_threads.peek()->id);
 	sleeping_threads.pop();
-}
-
-/**
- * @brief make the front of the ready threads list the current running thread.
- */
-int ready_to_running()
-{
-	// pop the topmost ready thread to be the running thread
-	running_thread = ready_threads.front();
-	ready_threads.pop_front();
-	// jump to the running thread's last state
-	siglongjmp(running_thread.env[0], 1);
-
-	// TODO: maybe move this to the general case of a thread starting a run
-	// increase thread's quantum counter
-	running_thread.increase_quantums();
-	total_quantums++;
-
-	// start timer for the running thread
-
-	if (setitimer(ITIMER_VIRTUAL, &timer, NULL))
-	{
-		// TODO: print error
-		return -1;    // TODO: bubble up error
-	}
 }
 
 timeval calc_wake_up_timeval(int usecs_to_sleep)

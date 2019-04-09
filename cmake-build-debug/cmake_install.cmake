@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/kalir/CLionProjects/ex2
+# Install script for directory: C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/kalir/CLionProjects/ex2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

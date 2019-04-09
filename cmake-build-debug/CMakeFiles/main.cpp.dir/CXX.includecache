@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/sleeping_threads_list.cpp
+sleeping_threads_list.h
+C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/sleeping_threads_list.h
+
+C:/Users/kalir/Desktop/Univ/Year 2/Semester B/OS/ex2/sleeping_threads_list.h
+deque
+-
+sys/time.h
+-
+
