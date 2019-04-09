@@ -3,22 +3,26 @@
 #include "thread.h"
 #include <list>
 #include <unordered_map>
+#include <algorithm>
 
 #include <stdio.h>
 #include <signal.h>
 #include <sys/time.h>
+#include "sleeping_threads_list.h"
 
 // Constants //
 
 
 // Variables //
-int quantum, total_quantums;
+int total_quantums;
 std::unordered_map<int, Thread> threads;
 std::list <Thread> ready_threads;
 Thread running_thread; //TODO: figure this out
-std::list <Thread> blocked_threads;
 std::unordered_map<int, std::list<Thread>> thread_states = {{READY,   ready_threads},
 															{BLOCKED, blocked_threads}};
+SleepingThreadsList sleeping_threads;
+struct itimerval quantum_timer, sleep_timer;
+struct sigaction quantum_sa, sleep_sa;
 
 
 /*
@@ -31,8 +35,27 @@ std::unordered_map<int, std::list<Thread>> thread_states = {{READY,   ready_thre
 */
 int uthread_init(int quantum_usecs)
 {
-	quantum = quantum_usecs; // TODO: return value
 	total_quantums = 1; // TODO: is 1 because of the pre existing main thread
+
+	// init quantum timer
+	quantum_timer.it_value.tv_sec = 0;
+	quantum_timer.it_value.tv_usec = quantum_usecs;
+	quantum_sa.sa_handler = &quantum_handler;
+	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
+	{
+		// TODO: print error
+		return -1;
+	}
+
+	// init sleep timer
+	sleep_timer.it_value.tv_sec = 0;
+	sleep_timer.it_value.tv_usec = 0;
+	sleep_sa.sa_handler = &sleep_handler;
+	if (sigaction(SIGALRM, &sleep_handler, NULL) < 0)
+	{
+		// TODO: print error
+		return -1;
+	}
 
 	// TODO create main thread (possibly in the ctor)
 	return 0;
@@ -78,15 +101,15 @@ int uthread_terminate(int tid)
 	{
 		return -1;
 	}
-	Thread curr_thread = threads[tid];
-	int state = curr_thread.get_state();
-	std::list <Thread> curr_state_lst = thread_states[state];
-	curr_state_lst.remove(curr_thread);
+	if (running_thread.get_id() == tid)
+	{
+		ready_to_running();
+	}
+	else if (ready_threads.find(tid) != ready_threads.end())
+	{
+		ready_threads.remove(threads[tid]);
+	}
 	threads.erase(tid);
-	delete curr_thread;
-
-
-	ready_to_running();
 }
 
 
@@ -101,19 +124,23 @@ int uthread_terminate(int tid)
 */
 int uthread_block(int tid)
 {
+	// don't allow blocking of the main thread (or a non existing one)
 	if (tid == 0 || threads.find(tid) == threads.end())
 	{
 		return -1;
 	}
-	//TODO: understand the algorithm
-	threads[tid].set_state(BLOCKED);
+	// if thread is the running thread, run the next ready thread
+	if (threads[tid] == running_thread)
+	{
+		ready_to_running();
+	}
 	return 0;
 }
 
 
 /*
  * Description: This function resumes a blocked thread with ID tid and moves
- * it to the READY state if it's not synced. Resuming a thread in a RUNNING or READY state
+ * it to the READY state. Resuming a thread in a RUNNING or READY state
  * has no effect and is not considered as an error. If no thread with
  * ID tid exists it is considered an error.
  * Return value: On success, return 0. On failure, return -1.
@@ -125,28 +152,39 @@ int uthread_resume(int tid)
 		return -1;
 	}
 	Thread curr_thread = threads[tid];
-	if (curr_thread.get_state() == BLOCKED)
+	// if thread to resume is not running or already ready
+	if ((ready_threads.find(tid) != ready_threads.end()) && (running_thread.get_id() != tid)
 	{
-		blocked_threads.remove(curr_thread);
+		ready_threads.push_back(curr_thread);
 	}
 	return 0;
 }
 
 
 /*
- * Description: This function blocks the RUNNING thread for user specified micro-seconds (virtual time).
+ * Description: This function blocks the RUNNING thread for user specified micro-seconds (REAL
+ * time).
  * It is considered an error if the main thread (tid==0) calls this function.
  * Immediately after the RUNNING thread transitions to the BLOCKED state a scheduling decision
  * should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sleep(int usec)
+int uthread_sleep(unsigned int usec)
 {
+	// don't allow main thread sleeping
 	if (running_thread.get_id() == 0)
 	{
 		return -1;
 	}
-	//TODO: what to do with the usec?
+	// update sleep_timer values
+	sleep_timer.it_value.tv_usec = usec;
+	sleeping_threads.add(running_thread.get_id(), calc_wake_up_timeval(usec));
+	if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
+	{
+		// TODO: print error
+		return -1;    // TODO: bubble up error
+	}
+	ready_to_running();
 }
 
 
@@ -206,15 +244,22 @@ void add_to_list(int id, int state)
 /** Handlers */
 void quantum_handler(int sig)
 {
-	// assuming sig = SIGVALRM
+	// assuming sig = SIGVTALRM
 	sigsetjmp(running_thread.env[0], 1);
 	ready_to_running();
+}
+
+void sleep_handler(int sig)
+{
+	// assuming sig = SIGALRM
+	uthread_resume(sleeping_threads.peek()->id);
+	sleeping_threads.pop();
 }
 
 /**
  * @brief make the front of the ready threads list the current running thread.
  */
-void ready_to_running()
+int ready_to_running()
 {
 	// pop the topmost ready thread to be the running thread
 	running_thread = ready_threads.front();
@@ -226,4 +271,23 @@ void ready_to_running()
 	// increase thread's quantum counter
 	running_thread.increase_quantums();
 	total_quantums++;
+
+	// start timer for the running thread
+
+	if (setitimer(ITIMER_VIRTUAL, &timer, NULL))
+	{
+		// TODO: print error
+		return -1;    // TODO: bubble up error
+	}
+}
+
+timeval calc_wake_up_timeval(int usecs_to_sleep)
+{
+
+	timeval now, time_to_sleep, wake_up_timeval;
+	gettimeofday(&now, nullptr);
+	time_to_sleep.tv_sec = usecs_to_sleep / 1000000;
+	time_to_sleep.tv_usec = usecs_to_sleep % 1000000;
+	timeradd(&now, &time_to_sleep, &wake_up_timeval);
+	return wake_up_timeval;
 }
