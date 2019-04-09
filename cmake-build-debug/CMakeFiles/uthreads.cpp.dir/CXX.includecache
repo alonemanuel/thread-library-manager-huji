@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.cpp
+sleeping_threads_list.h
+/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.h
+
+/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.h
+deque
+-
+sys/time.h
+-
+

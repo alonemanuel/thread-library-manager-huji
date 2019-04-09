@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named main.cpp
+# Target rules for targets named ex2
 
 # Build rule for target.
-main.cpp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 main.cpp
-.PHONY : main.cpp
+ex2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ex2
+.PHONY : ex2
 
 # fast build rule for target.
-main.cpp/fast:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/build
-.PHONY : main.cpp/fast
+ex2/fast:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/build
+.PHONY : ex2/fast
 
 sleeping_threads_list.o: sleeping_threads_list.cpp.o
 
@@ -129,7 +129,7 @@ sleeping_threads_list.o: sleeping_threads_list.cpp.o
 
 # target to build an object file
 sleeping_threads_list.cpp.o:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.o
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o
 .PHONY : sleeping_threads_list.cpp.o
 
 sleeping_threads_list.i: sleeping_threads_list.cpp.i
@@ -138,7 +138,7 @@ sleeping_threads_list.i: sleeping_threads_list.cpp.i
 
 # target to preprocess a source file
 sleeping_threads_list.cpp.i:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.i
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.i
 .PHONY : sleeping_threads_list.cpp.i
 
 sleeping_threads_list.s: sleeping_threads_list.cpp.s
@@ -147,8 +147,35 @@ sleeping_threads_list.s: sleeping_threads_list.cpp.s
 
 # target to generate assembly for a file
 sleeping_threads_list.cpp.s:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/sleeping_threads_list.cpp.s
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.s
 .PHONY : sleeping_threads_list.cpp.s
+
+test1.o: test1.cpp.o
+
+.PHONY : test1.o
+
+# target to build an object file
+test1.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.o
+.PHONY : test1.cpp.o
+
+test1.i: test1.cpp.i
+
+.PHONY : test1.i
+
+# target to preprocess a source file
+test1.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.i
+.PHONY : test1.cpp.i
+
+test1.s: test1.cpp.s
+
+.PHONY : test1.s
+
+# target to generate assembly for a file
+test1.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.s
+.PHONY : test1.cpp.s
 
 thread.o: thread.cpp.o
 
@@ -156,7 +183,7 @@ thread.o: thread.cpp.o
 
 # target to build an object file
 thread.cpp.o:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/thread.cpp.o
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/thread.cpp.o
 .PHONY : thread.cpp.o
 
 thread.i: thread.cpp.i
@@ -165,7 +192,7 @@ thread.i: thread.cpp.i
 
 # target to preprocess a source file
 thread.cpp.i:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/thread.cpp.i
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/thread.cpp.i
 .PHONY : thread.cpp.i
 
 thread.s: thread.cpp.s
@@ -174,7 +201,7 @@ thread.s: thread.cpp.s
 
 # target to generate assembly for a file
 thread.cpp.s:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/thread.cpp.s
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/thread.cpp.s
 .PHONY : thread.cpp.s
 
 uthreads.o: uthreads.cpp.o
@@ -183,7 +210,7 @@ uthreads.o: uthreads.cpp.o
 
 # target to build an object file
 uthreads.cpp.o:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/uthreads.cpp.o
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/uthreads.cpp.o
 .PHONY : uthreads.cpp.o
 
 uthreads.i: uthreads.cpp.i
@@ -192,7 +219,7 @@ uthreads.i: uthreads.cpp.i
 
 # target to preprocess a source file
 uthreads.cpp.i:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/uthreads.cpp.i
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/uthreads.cpp.i
 .PHONY : uthreads.cpp.i
 
 uthreads.s: uthreads.cpp.s
@@ -201,7 +228,7 @@ uthreads.s: uthreads.cpp.s
 
 # target to generate assembly for a file
 uthreads.cpp.s:
-	$(MAKE) -f CMakeFiles/main.cpp.dir/build.make CMakeFiles/main.cpp.dir/uthreads.cpp.s
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/uthreads.cpp.s
 .PHONY : uthreads.cpp.s
 
 # Help Target
@@ -212,10 +239,13 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... main.cpp"
+	@echo "... ex2"
 	@echo "... sleeping_threads_list.o"
 	@echo "... sleeping_threads_list.i"
 	@echo "... sleeping_threads_list.s"
+	@echo "... test1.o"
+	@echo "... test1.i"
+	@echo "... test1.s"
 	@echo "... thread.o"
 	@echo "... thread.i"
 	@echo "... thread.s"

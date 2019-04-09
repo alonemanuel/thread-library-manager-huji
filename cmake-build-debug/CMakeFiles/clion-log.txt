@@ -1,4 +1,16 @@
 /usr/local/APP/jetbrains/clion/2018.2.1/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /cs/usr/alonemanuel/OS/ex2
 -- Configuring done
--- Generating done
+CMake Error at CMakeLists.txt:6 (add_executable):
+  Cannot find source file:
+
+    test1.cpp
+
+  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
+  .hpp .hxx .in .txx
+
+
+CMake Error at CMakeLists.txt:6 (add_executable):
+  No SOURCES given to target: ex2
+
+
 -- Build files have been written to: /cs/usr/alonemanuel/OS/ex2/cmake-build-debug

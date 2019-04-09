@@ -118,7 +118,11 @@ int uthread_init(int quantum_usecs)
 		return -1;
 	}
 
-	// TODO create main thread (possibly in the ctor)
+	// create main thread
+	Thread new_thread;
+	threads[new_thread.get_id()] = new_thread;
+	running_thread = new_thread;
+
 	return 0;
 }
 

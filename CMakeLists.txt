@@ -3,5 +3,6 @@ project(ex2)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(main.cpp uthreads.cpp uthreads.h thread.h thread.cpp 
-        sleeping_threads_list.cpp sleeping_threads_list.h)
+add_executable(ex2 uthreads.cpp uthreads.h
+        sleeping_threads_list.cpp sleeping_threads_list.h
+        thread.h thread.cpp test1.cpp)

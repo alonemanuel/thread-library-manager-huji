@@ -51,4 +51,3 @@ wake_up_info* SleepingThreadsList::peek(){
 	return &sleeping_threads.at(0);
 }
 
-
