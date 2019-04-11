@@ -12,12 +12,6 @@ deque
 sys/time.h
 -
 
-/cs/usr/alonemanuel/OS/ex2/thread.cpp
-uthreads.h
-/cs/usr/alonemanuel/OS/ex2/uthreads.h
-thread.h
-/cs/usr/alonemanuel/OS/ex2/thread.h
-
 /cs/usr/alonemanuel/OS/ex2/thread.h
 uthreads.h
 /cs/usr/alonemanuel/OS/ex2/uthreads.h
@@ -43,11 +37,15 @@ unordered_map
 -
 algorithm
 -
+iostream
+-
 stdio.h
 -
 signal.h
 -
 sys/time.h
+-
+memory
 -
 sleeping_threads_list.h
 /cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.h

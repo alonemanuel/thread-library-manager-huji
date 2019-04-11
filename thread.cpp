@@ -19,10 +19,15 @@ address_t translate_address(address_t addr)
 	return ret;
 }
 
+/**
+ * @brief Constructor of a thread object
+ * @param f thread function address
+ */
 Thread::Thread(void (*f)(void)) : _state(READY), _stack_size(STACK_SIZE), _id
 		(num_of_threads), _quantums(0), func(f)
 {
-	if (num_of_threads ){
+	if (num_of_threads)
+	{
 
 		sp = (address_t) stack + STACK_SIZE - sizeof(address_t);
 		pc = (address_t) f;
@@ -35,6 +40,7 @@ Thread::Thread(void (*f)(void)) : _state(READY), _stack_size(STACK_SIZE), _id
 }
 
 
-bool Thread::operator==(const Thread& other) const{
-	return _id==other.get_id();
+bool Thread::operator==(const Thread &other) const
+{
+	return _id == other.get_id();
 }
