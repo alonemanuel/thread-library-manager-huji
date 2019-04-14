@@ -25,6 +25,8 @@ unistd.h
 -
 sys/time.h
 -
+memory
+-
 
 /cs/usr/alonemanuel/OS/ex2/uthreads.cpp
 uthreads.h

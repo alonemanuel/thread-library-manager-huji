@@ -26,6 +26,9 @@ using std::shared_ptr;
 // Static Variables //
 int total_quantums;
 
+sigjmp_buf env[2];
+int current_thread;
+
 /**
  * @brief map of all existing threads, with their tid as key.
  */
@@ -106,35 +109,42 @@ timeval calc_wake_up_timeval(int usecs_to_sleep)
 /**
  * @brief make the front of the ready threads list the current running thread.
  */
-int ready_to_running()
+void ready_to_running()
 {
+//	cout<<"curr running tid is " <<running_thread->get_id()<<endl;
+
+	int ret_val = sigsetjmp(running_thread->env[0], 1);
+//	printf("SWITCH: ret_val=%d\n", ret_val);
+	if (ret_val == 1)
+	{
+		return;
+	}
 	// push the current running thread to the back of the ready threads
 	ready_threads.push_back(running_thread);
 	// pop the topmost ready thread to be the running thread
 	running_thread = ready_threads.front();
-	running_thread->increase_quantums();
+
+//	cout<<"after switch running tid is " <<running_thread->get_id()<<endl;
 	ready_threads.pop_front();
-	// TODO: maybe move this to the general case of a thread starting a run
 	// increase thread's quantum counter
 	running_thread->increase_quantums();
+	// TODO: maybe move this to the general case of a thread starting a run
 	total_quantums++;
-
-	// start timer for the running thread
-
+	// jump to the running thread's last state
 	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
 	{
 		// TODO: print error
-		return -1;    // TODO: bubble up error
+		return;    // TODO: bubble up error
 	}
-	// jump to the running thread's last state
 	siglongjmp(running_thread->env[0], 1);
 }
+
 
 // Handlers //
 void quantum_handler(int sig)
 {
 	// assuming sig = SIGVTALRM
-	sigsetjmp(running_thread->env[0], 1);
+//	cout << "Quantum expired!" << endl;
 	ready_to_running();
 }
 
@@ -159,6 +169,8 @@ void sleep_handler(int sig)
 */
 int uthread_init(int quantum_usecs)
 {
+
+
 	// 1 because of the main thread
 	total_quantums = 1;
 
@@ -171,6 +183,8 @@ int uthread_init(int quantum_usecs)
 	// init quantum timer
 	quantum_timer.it_value.tv_sec = 0;
 	quantum_timer.it_value.tv_usec = quantum_usecs;
+//	quantum_timer.it_interval.tv_sec = 0;
+//	quantum_timer.it_interval.tv_sec =0;
 	quantum_sa.sa_handler = &quantum_handler;
 	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
 	{
@@ -180,6 +194,8 @@ int uthread_init(int quantum_usecs)
 	// init sleep timer
 	sleep_timer.it_value.tv_sec = 0;
 	sleep_timer.it_value.tv_usec = 0;
+	sleep_timer.it_interval.tv_usec = 0;
+	sleep_timer.it_interval.tv_usec = 0;
 	sleep_sa.sa_handler = &sleep_handler;
 	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
 	{
@@ -189,8 +205,7 @@ int uthread_init(int quantum_usecs)
 	// set timer
 	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
 	{
-		// TODO: print error
-		return -1;    // TODO: bubble up error
+		exit_with_err(SYS_ERR_CODE, "timer set failed.");
 	}
 
 	// create main thread
@@ -266,15 +281,32 @@ int uthread_terminate(int tid)
 */
 int uthread_block(int tid)
 {
+	shared_ptr<Thread> to_delete;
 	// don't allow blocking of the main thread (or a non existing one)
 	if (tid == 0 || threads.find(tid) == threads.end())
 	{
 		return -1;
 	}
+
+
+
+
 	// if thread is the running thread, run the next ready thread
 	if (threads[tid] == running_thread)
 	{
 		ready_to_running();
+	}
+	// block thread (remove from ready)
+	for (std::list<shared_ptr<Thread>>::iterator it = ready_threads.begin(); it != ready_threads.end(); ++it)
+	{
+		if ((*it)->get_id() == tid)
+		{
+			to_delete = *it;
+		}
+	}
+	if (to_delete != nullptr)
+	{
+		ready_threads.remove(to_delete);
 	}
 	return 0;
 }

@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <memory>
 
 #define EX2_THREAD_H
 #define READY 0
@@ -20,25 +21,29 @@ typedef unsigned long address_t;
 #define JB_SP 6
 #define JB_PC 7
 
+
+using std::shared_ptr;
+
 class Thread
 {
 
 private:
 	static int num_of_threads;
-	address_t sp, pc;
-	char stack[STACK_SIZE];
-
-
 protected:
+
+
 	int _state;
 	int _stack_size;
 	int _id;
 	int _quantums;
 
+public:
+
 	void (*func)(void);
 
-public:
+	char *stack;
 	sigjmp_buf env[1];
+	address_t sp, pc;
 
 
 	Thread(void (*f)(void) = nullptr);
