@@ -96,25 +96,25 @@ CMakeFiles/ex2.dir/thread.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2.dir/thread.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/alonemanuel/OS/ex2/thread.cpp -o CMakeFiles/ex2.dir/thread.cpp.s
 
-CMakeFiles/ex2.dir/test3.cpp.o: CMakeFiles/ex2.dir/flags.make
-CMakeFiles/ex2.dir/test3.cpp.o: ../test3.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ex2.dir/test3.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2.dir/test3.cpp.o -c /cs/usr/alonemanuel/OS/ex2/test3.cpp
+CMakeFiles/ex2.dir/SleepTest2.cpp.o: CMakeFiles/ex2.dir/flags.make
+CMakeFiles/ex2.dir/SleepTest2.cpp.o: ../SleepTest2.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ex2.dir/SleepTest2.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2.dir/SleepTest2.cpp.o -c /cs/usr/alonemanuel/OS/ex2/SleepTest2.cpp
 
-CMakeFiles/ex2.dir/test3.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ex2.dir/test3.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/alonemanuel/OS/ex2/test3.cpp > CMakeFiles/ex2.dir/test3.cpp.i
+CMakeFiles/ex2.dir/SleepTest2.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ex2.dir/SleepTest2.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/alonemanuel/OS/ex2/SleepTest2.cpp > CMakeFiles/ex2.dir/SleepTest2.cpp.i
 
-CMakeFiles/ex2.dir/test3.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2.dir/test3.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/alonemanuel/OS/ex2/test3.cpp -o CMakeFiles/ex2.dir/test3.cpp.s
+CMakeFiles/ex2.dir/SleepTest2.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2.dir/SleepTest2.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/alonemanuel/OS/ex2/SleepTest2.cpp -o CMakeFiles/ex2.dir/SleepTest2.cpp.s
 
 # Object files for target ex2
 ex2_OBJECTS = \
 "CMakeFiles/ex2.dir/uthreads.cpp.o" \
 "CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o" \
 "CMakeFiles/ex2.dir/thread.cpp.o" \
-"CMakeFiles/ex2.dir/test3.cpp.o"
+"CMakeFiles/ex2.dir/SleepTest2.cpp.o"
 
 # External object files for target ex2
 ex2_EXTERNAL_OBJECTS =
@@ -122,7 +122,7 @@ ex2_EXTERNAL_OBJECTS =
 ex2: CMakeFiles/ex2.dir/uthreads.cpp.o
 ex2: CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o
 ex2: CMakeFiles/ex2.dir/thread.cpp.o
-ex2: CMakeFiles/ex2.dir/test3.cpp.o
+ex2: CMakeFiles/ex2.dir/SleepTest2.cpp.o
 ex2: CMakeFiles/ex2.dir/build.make
 ex2: CMakeFiles/ex2.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ex2"

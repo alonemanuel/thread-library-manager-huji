@@ -123,6 +123,33 @@ ex2/fast:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/build
 .PHONY : ex2/fast
 
+SleepTest2.o: SleepTest2.cpp.o
+
+.PHONY : SleepTest2.o
+
+# target to build an object file
+SleepTest2.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/SleepTest2.cpp.o
+.PHONY : SleepTest2.cpp.o
+
+SleepTest2.i: SleepTest2.cpp.i
+
+.PHONY : SleepTest2.i
+
+# target to preprocess a source file
+SleepTest2.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/SleepTest2.cpp.i
+.PHONY : SleepTest2.cpp.i
+
+SleepTest2.s: SleepTest2.cpp.s
+
+.PHONY : SleepTest2.s
+
+# target to generate assembly for a file
+SleepTest2.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/SleepTest2.cpp.s
+.PHONY : SleepTest2.cpp.s
+
 sleeping_threads_list.o: sleeping_threads_list.cpp.o
 
 .PHONY : sleeping_threads_list.o
@@ -149,33 +176,6 @@ sleeping_threads_list.s: sleeping_threads_list.cpp.s
 sleeping_threads_list.cpp.s:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.s
 .PHONY : sleeping_threads_list.cpp.s
-
-test3.o: test3.cpp.o
-
-.PHONY : test3.o
-
-# target to build an object file
-test3.cpp.o:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.o
-.PHONY : test3.cpp.o
-
-test3.i: test3.cpp.i
-
-.PHONY : test3.i
-
-# target to preprocess a source file
-test3.cpp.i:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.i
-.PHONY : test3.cpp.i
-
-test3.s: test3.cpp.s
-
-.PHONY : test3.s
-
-# target to generate assembly for a file
-test3.cpp.s:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.s
-.PHONY : test3.cpp.s
 
 thread.o: thread.cpp.o
 
@@ -240,12 +240,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... ex2"
+	@echo "... SleepTest2.o"
+	@echo "... SleepTest2.i"
+	@echo "... SleepTest2.s"
 	@echo "... sleeping_threads_list.o"
 	@echo "... sleeping_threads_list.i"
 	@echo "... sleeping_threads_list.s"
-	@echo "... test3.o"
-	@echo "... test3.i"
-	@echo "... test3.s"
 	@echo "... thread.o"
 	@echo "... thread.i"
 	@echo "... thread.s"

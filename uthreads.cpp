@@ -76,25 +76,26 @@ int get_min_id()
  * @param code error code
  * @param text explanatory text for the error
  */
-int print_err(int code, string text, bool should_exit=true)
+int print_err(int code, string text)
 {
 	string prefix;
-	int ret_val;
 	switch (code)
 	{
 		case SYS_ERR_CODE:
 			prefix = "system error: ";
-			ret_val = 1;
+			break;
 		case THREAD_ERR_CODE:
 			prefix = "thread library error: ";
-			ret_val = -1; // TODO: should return appropriate return value;
+			break;
 	}
-	cerr << prefix << text << endl;
-	if(should_exit){
-		exit(ret_val);    // TODO we need to return on failures, but exit makes it irrelevant
+	cout << prefix << text << endl;
+	if (code == SYS_ERR_CODE)
+	{
+		exit(1);    // TODO we need to return on failures, but exit makes it irrelevant
 	}
-	else{
-		return ret_val;
+	else
+	{
+		return -1;
 	}
 
 }
@@ -198,18 +199,18 @@ int uthread_init(int quantum_usecs)
 	// quantum_usecs cannot be negative
 	if (quantum_usecs < 0)
 	{
-		print_err(THREAD_ERR_CODE, "quantum usecs should be non-negative.", false);
+		print_err(THREAD_ERR_CODE, "quantum usecs should be non-negative.");
 	}
 
 	// init quantum timer
-	quantum_timer.it_value.tv_sec = 0;
-	quantum_timer.it_value.tv_usec = quantum_usecs;
+	quantum_timer.it_value.tv_sec = quantum_usecs / 1000000;
+	quantum_timer.it_value.tv_usec = quantum_usecs % 1000000;
 //	quantum_timer.it_interval.tv_sec = 0;
 //	quantum_timer.it_interval.tv_sec =0;
 	quantum_sa.sa_handler = &quantum_handler;
 	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
 	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.", false);
+		print_err(SYS_ERR_CODE, "timer initialization failed.");
 	}
 
 	// init sleep timer
@@ -220,13 +221,13 @@ int uthread_init(int quantum_usecs)
 	sleep_sa.sa_handler = &sleep_handler;
 	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
 	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.", false);
+		print_err(SYS_ERR_CODE, "timer initialization failed.");
 	}
 
 	// set timer
 	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
 	{
-		print_err(SYS_ERR_CODE, "timer set failed.", false);
+		print_err(SYS_ERR_CODE, "timer set failed.");
 	}
 
 	// create main thread
@@ -253,7 +254,7 @@ int uthread_spawn(void (*f)(void))
 {
 	if (threads.size() == MAX_THREAD_NUM)
 	{
-		return (print_err(THREAD_ERR_CODE, "max number of threads exceeded.", false));
+		return (print_err(THREAD_ERR_CODE, "max number of threads exceeded."));
 	}
 
 	shared_ptr<Thread> new_thread = std::make_shared<Thread>(Thread(f, get_min_id()));
@@ -278,9 +279,10 @@ int uthread_terminate(int tid)
 { //TODO: consider an error and memory deallocation
 	if (threads.find(tid) == threads.end())
 	{
-		return print_err(THREAD_ERR_CODE, "invalid thread id.", false);
+		return print_err(THREAD_ERR_CODE, "invalid thread id.");
 	}
-	if(tid==0){
+	if (tid == 0)
+	{
 		exit(0);
 	}
 	if (running_thread->get_id() == tid)
@@ -317,7 +319,7 @@ int uthread_block(int tid)
 	// don't allow blocking of the main thread (or a non existing one)
 	if (tid == 0 || threads.find(tid) == threads.end())
 	{
-		return print_err(THREAD_ERR_CODE, "unable to block non-existing/main thread") ;
+		return print_err(THREAD_ERR_CODE, "unable to block non-existing/main thread");
 	}
 
 
@@ -355,7 +357,7 @@ int uthread_resume(int tid)
 {
 	if (threads.find(tid) == threads.end())
 	{
-		return -1;
+		return print_err(THREAD_ERR_CODE, "no such thread exsits.");
 	}
 	shared_ptr<Thread> curr_thread = threads[tid];
 	// if thread to resume is not running or already ready
@@ -375,20 +377,19 @@ int uthread_resume(int tid)
  * should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sleep(unsigned int usec)
+int uthread_sleep(int usec)
 {
 	// don't allow main thread sleeping
 	if (running_thread->get_id() == 0)
 	{
-		return -1;
+		return print_err(THREAD_ERR_CODE, "main thread can't be put to sleep.");
 	}
 	// update sleep_timer values
 	sleep_timer.it_value.tv_usec = usec;
 	sleeping_threads.add(running_thread->get_id(), calc_wake_up_timeval(usec));
 	if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
 	{
-		// TODO: print error
-		return -1;    // TODO: bubble up error
+		print_err(SYS_ERR_CODE, "setting timer failed.");
 	}
 	ready_to_running();
 }

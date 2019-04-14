@@ -84,13 +84,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/cs/usr/alonemanuel/OS/ex2/SleepTest2.cpp">
+			<Option target="ex2"/>
+		</Unit>
 		<Unit filename="/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.cpp">
 			<Option target="ex2"/>
 		</Unit>
 		<Unit filename="/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.h">
-			<Option target="ex2"/>
-		</Unit>
-		<Unit filename="/cs/usr/alonemanuel/OS/ex2/test3.cpp">
 			<Option target="ex2"/>
 		</Unit>
 		<Unit filename="/cs/usr/alonemanuel/OS/ex2/thread.cpp">

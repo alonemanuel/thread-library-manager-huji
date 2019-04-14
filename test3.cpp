@@ -45,6 +45,7 @@ int main(void)
     uthread_spawn(f);
     uthread_terminate(1);
 
+
     uthread_terminate(1);
     uthread_block(1);
     uthread_resume(1);
@@ -53,6 +54,7 @@ int main(void)
     uthread_init(0);
     uthread_init(-5);
 
+    std::cout<<"got here"<<std::endl;
 
     uthread_terminate(0);
     return 0;
