@@ -150,32 +150,32 @@ sleeping_threads_list.cpp.s:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.s
 .PHONY : sleeping_threads_list.cpp.s
 
-test1.o: test1.cpp.o
+test3.o: test3.cpp.o
 
-.PHONY : test1.o
+.PHONY : test3.o
 
 # target to build an object file
-test1.cpp.o:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.o
-.PHONY : test1.cpp.o
+test3.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.o
+.PHONY : test3.cpp.o
 
-test1.i: test1.cpp.i
+test3.i: test3.cpp.i
 
-.PHONY : test1.i
+.PHONY : test3.i
 
 # target to preprocess a source file
-test1.cpp.i:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.i
-.PHONY : test1.cpp.i
+test3.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.i
+.PHONY : test3.cpp.i
 
-test1.s: test1.cpp.s
+test3.s: test3.cpp.s
 
-.PHONY : test1.s
+.PHONY : test3.s
 
 # target to generate assembly for a file
-test1.cpp.s:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test1.cpp.s
-.PHONY : test1.cpp.s
+test3.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/test3.cpp.s
+.PHONY : test3.cpp.s
 
 thread.o: thread.cpp.o
 
@@ -243,9 +243,9 @@ help:
 	@echo "... sleeping_threads_list.o"
 	@echo "... sleeping_threads_list.i"
 	@echo "... sleeping_threads_list.s"
-	@echo "... test1.o"
-	@echo "... test1.i"
-	@echo "... test1.s"
+	@echo "... test3.o"
+	@echo "... test3.i"
+	@echo "... test3.s"
 	@echo "... thread.o"
 	@echo "... thread.i"
 	@echo "... thread.s"

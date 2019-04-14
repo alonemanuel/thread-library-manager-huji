@@ -4,8 +4,8 @@
 CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o: ../sleeping_threads_list.cpp
 CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o: ../sleeping_threads_list.h
 
-CMakeFiles/ex2.dir/test1.cpp.o: ../test1.cpp
-CMakeFiles/ex2.dir/test1.cpp.o: ../uthreads.h
+CMakeFiles/ex2.dir/test3.cpp.o: ../test3.cpp
+CMakeFiles/ex2.dir/test3.cpp.o: ../uthreads.h
 
 CMakeFiles/ex2.dir/thread.cpp.o: ../thread.cpp
 CMakeFiles/ex2.dir/thread.cpp.o: ../thread.h

@@ -30,8 +30,6 @@ class Thread
 private:
 	static int num_of_threads;
 protected:
-
-
 	int _state;
 	int _stack_size;
 	int _id;
@@ -46,7 +44,7 @@ public:
 	address_t sp, pc;
 
 
-	Thread(void (*f)(void) = nullptr);
+	Thread(void (*f)(void) = nullptr, int id=0);
 
 	int get_id() const
 	{ return _id; };
