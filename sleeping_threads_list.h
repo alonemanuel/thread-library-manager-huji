@@ -30,6 +30,8 @@ public:
 	*/
 	void add(int thread_id, timeval timestamp);
 
+	void remove(int tid);
+
 	/*
 	 * Description: This method removes the thread at the top of this list.
 	 * If the list is empty, it does nothing.

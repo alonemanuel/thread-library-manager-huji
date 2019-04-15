@@ -7,8 +7,8 @@
 #include "thread.h"
 #include <memory>
 
-using std::cout,
-std::endl;
+using std::cout;
+using std::endl;
 
 int Thread::num_of_threads = 0;
 

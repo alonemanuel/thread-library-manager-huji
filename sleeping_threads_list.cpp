@@ -31,6 +31,15 @@ void SleepingThreadsList::add(int thread_id, timeval wakeup_tv) {
 	}
 }
 
+void SleepingThreadsList::remove(int tid){
+	for (deque<wake_up_info>::iterator it = sleeping_threads.begin(); it != sleeping_threads.end(); ++it){
+		if(it->id == tid){
+			sleeping_threads.erase(it);
+			return;
+		}
+	}
+}
+
 /*
  * Description: This method removes the thread at the top of this list.
  * If the list is empty, it does nothing.
