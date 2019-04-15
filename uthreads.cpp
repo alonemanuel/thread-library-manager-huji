@@ -14,11 +14,25 @@
 // Constants //
 #define SYS_ERR_CODE 0
 #define THREAD_ERR_CODE 1
+#define MAX_THREAD_NUM 100 /* maximal number of threads */
+#define STACK_SIZE 4096 /* stack size per thread (in bytes) */
+#define TIMER_SET_MSG "setting the timer has failed."
+#define INVALID_ID_MSG "thread ID must be between 0 and "+ to_string(MAX_THREAD_NUM) + "."
+/* External interface */
 
+
+
+#define ID_NONEXIST_MSG "thread with such ID does not exist."
+
+#define BLOCK_MAIN_MSG "main thread cannot be blocked."
+
+#define NEG_TIME_MSG "time must be non-negative."
+
+#define MAX_THREAD_MSG "max number of threads exceeded."
 // Using //
 
-using std::cout,
-std::endl;
+using std::cout;
+using std::endl;
 
 using std::shared_ptr;
 
@@ -27,7 +41,6 @@ using std::shared_ptr;
 int total_quantums;
 
 sigjmp_buf env[2];
-int current_thread;
 
 sigset_t sigs_to_block;
 
@@ -62,7 +75,7 @@ struct sigaction quantum_sa, sleep_sa;
 
 void block_signals()
 {
-	sigprocmask(SIG_SETMASK, &sigs_to_block, NULL);
+	sigprocmask(SIG_BLOCK, &sigs_to_block, NULL);
 
 }
 
@@ -72,7 +85,7 @@ void unblock_signals()
 
 }
 
-int get_min_id()
+unsigned int get_min_id()
 {
 	block_signals();
 

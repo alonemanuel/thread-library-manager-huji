@@ -1,0 +1,27 @@
+tomka, alonemanuel
+Tom Kalir (316426485), Alon Emanuel (205894058)
+EX: 1
+
+FILES:
+myfile.c -- a file with some code
+myfile.h -- a file with some headers
+
+REMARKS:
+
+ANSWERS:
+
+Assignment 1:
+
+After running the file there are two options -
+
+1. If you supply a single argument, the program creates a directory called 'Welcome',
+and inside 'Welcome' it creates another directory called 'To', and inside of that it creates a file
+called 'OS2018'.
+It then opens the file and writes the following text into it:
+"[username]
+If you haven't read the course guidelines yet --- do it right now!
+[supplied argument]"
+It then closes the file and deletes it, and then goes on to delete the directories in a reverse order.
+
+2. Else, it prints the following error:
+"Error. The program should receive a single argument. Exiting."

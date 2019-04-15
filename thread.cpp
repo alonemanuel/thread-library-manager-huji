@@ -6,9 +6,11 @@
 #include "uthreads.h"
 #include "thread.h"
 #include <memory>
+#define STACK_SIZE 4096 /* stack size per thread (in bytes) */
 
 using std::cout;
 using std::endl;
+
 
 int Thread::num_of_threads = 0;
 

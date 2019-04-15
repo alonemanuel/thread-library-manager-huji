@@ -6,23 +6,7 @@
  * Author: OS, os@cs.huji.ac.il
  */
 
-#define MAX_THREAD_NUM 100 /* maximal number of threads */
-#define STACK_SIZE 4096 /* stack size per thread (in bytes) */
-#define TIMER_SET_MSG "setting the timer has failed."
-#define INVALID_ID_MSG "thread ID must be between 0 and "+ to_string(MAX_THREAD_NUM) + "."
-/* External interface */
 
-
-
-#define ID_NONEXIST_MSG "thread with such ID does not exist."
-
-#define BLOCK_MAIN_MSG "main thread cannot be blocked."
-
-#define NEG_TIME_MSG "time must be non-negative."
-
-#define TIMER_SET_MSG "setting the timer failed."
-
-#define MAX_THREAD_MSG "max number of threads exceeded."
 
 /*
  * Description: This function initializes the thread library.
@@ -90,7 +74,7 @@ int uthread_resume(int tid);
  * should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sleep(int usec);
+int uthread_sleep(unsigned int usec);
 
 
 /*
