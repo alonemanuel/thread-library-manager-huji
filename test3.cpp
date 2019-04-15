@@ -54,7 +54,6 @@ int main(void)
     uthread_init(0);
     uthread_init(-5);
 
-    std::cout<<"got here"<<std::endl;
 
     uthread_terminate(0);
     return 0;

@@ -107,7 +107,7 @@ int print_err(int code, string text)
 			prefix = "thread library error: ";
 			break;
 	}
-	cout << prefix << text << endl;
+	cerr << prefix << text << endl;
 	if (code == SYS_ERR_CODE)
 	{
 		exit(1);    // TODO we need to return on failures, but exit makes it irrelevant
@@ -120,6 +120,13 @@ int print_err(int code, string text)
 
 }
 
+void create_main_thread()
+{
+	shared_ptr<Thread> new_thread = std::make_shared<Thread>(Thread());
+	threads[new_thread->get_id()] = new_thread;
+	running_thread = new_thread;
+	running_thread->increase_quantums();
+}
 
 bool does_exist(std::list<shared_ptr<Thread>> lst, int tid)
 {
@@ -161,12 +168,10 @@ timeval calc_wake_up_timeval(int usecs_to_sleep)
 /**
  * @brief make the front of the ready threads list the current running thread.
  */
-void ready_to_running(bool is_blocking = 0)
+void ready_to_running(bool is_blocking = false)
 {
-//	cout<<"curr running tid is " <<running_thread->get_id()<<endl;
 	block_signals();
 	int ret_val = sigsetjmp(running_thread->env[0], 1);
-//	printf("SWITCH: ret_val=%d\n", ret_val);
 	if (ret_val == 1)
 	{
 		unblock_signals();
@@ -179,23 +184,57 @@ void ready_to_running(bool is_blocking = 0)
 	}
 	// pop the topmost ready thread to be the running thread
 	running_thread = ready_threads.front();
-
-//	cout<<"after switch running tid is " <<running_thread->get_id()<<endl;
-	ready_threads.pop_front();
 	// increase thread's quantum counter
 	running_thread->increase_quantums();
-	// TODO: maybe move this to the general case of a thread starting a run
 	total_quantums++;
+	ready_threads.pop_front();
 	// jump to the running thread's last state
 	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
 	{
-		unblock_signals();
 		print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 	}
 	unblock_signals();
 	siglongjmp(running_thread->env[0], 1);
 }
 
+shared_ptr<Thread> get_ready_thread(int tid)
+{
+	for (std::list<shared_ptr<Thread>>::iterator it = ready_threads.begin(); it != ready_threads.end(); ++it)
+	{
+		if ((*it)->get_id() == tid)
+		{
+			return *it;
+		}
+	}
+	return nullptr;
+}
+
+
+bool is_id_invalid(int tid)
+{
+	return ((tid < 0) || (tid > MAX_THREAD_NUM));
+
+}
+
+bool is_id_nonexisting(int tid)
+{
+	return threads.find(tid) == threads.end();
+}
+
+bool is_main_thread(int tid)
+{
+	return tid == 0;
+}
+
+bool is_time_invalid(int time)
+{
+	return time < 0;
+}
+
+bool is_running_thread(int tid)
+{
+	return tid == running_thread->get_id();
+}
 
 // Handlers //
 void quantum_handler(int sig)
@@ -212,7 +251,42 @@ void sleep_handler(int sig)
 	block_signals();
 	uthread_resume(sleeping_threads.peek()->id);
 	sleeping_threads.pop();
+	wake_up_info *last_sleeping = sleeping_threads.peek();
+	if (last_sleeping != nullptr)
+	{
+		// update sleep_timer values
+		sleep_timer.it_value.tv_sec = last_sleeping->awaken_tv.tv_sec / 1000000;
+		sleep_timer.it_value.tv_usec = last_sleeping->awaken_tv.tv_usec % 1000000;
+		if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
+		{
+			print_err(SYS_ERR_CODE, TIMER_SET_MSG);
+		}
+	}
 	unblock_signals();
+}
+
+
+void init_quantum_timer(int quantum_usecs)
+{
+	quantum_timer.it_value.tv_sec = quantum_usecs / 1000000;
+	quantum_timer.it_value.tv_usec = quantum_usecs % 1000000;
+	quantum_sa.sa_handler = &quantum_handler;
+	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
+	{
+		print_err(SYS_ERR_CODE, "timer initialization failed.");
+	}
+}
+
+void init_sleep_timer()
+{
+	sleep_timer.it_value.tv_sec = 0;
+	sleep_timer.it_value.tv_usec = 0;
+	sleep_sa.sa_handler = &sleep_handler;
+	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
+	{
+		print_err(SYS_ERR_CODE, "timer initialization failed.");
+	}
+
 }
 
 
@@ -229,50 +303,24 @@ void sleep_handler(int sig)
 int uthread_init(int quantum_usecs)
 {
 	block_signals();
-
+	// quantum_usecs cannot be negative
+	if (is_time_invalid(quantum_usecs))
+	{
+		return print_err(THREAD_ERR_CODE, NEG_TIME_MSG);
+	}
 	// 1 because of the main thread
 	total_quantums = 1;
-
-	// quantum_usecs cannot be negative
-	if (quantum_usecs < 0)
-	{
-		print_err(THREAD_ERR_CODE, "quantum usecs should be non-negative.");
-	}
-
-	// init quantum timer
-	quantum_timer.it_value.tv_sec = quantum_usecs / 1000000;
-	quantum_timer.it_value.tv_usec = quantum_usecs % 1000000;
-//	quantum_timer.it_interval.tv_sec = 0;
-//	quantum_timer.it_interval.tv_sec =0;
-	quantum_sa.sa_handler = &quantum_handler;
-	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
-	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.");
-	}
-
-	// init sleep timer
-	sleep_timer.it_value.tv_sec = 0;
-	sleep_timer.it_value.tv_usec = 0;
-//	sleep_timer.it_interval.tv_usec = 0;
-//	sleep_timer.it_interval.tv_usec = 0;
-	sleep_sa.sa_handler = &sleep_handler;
-	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
-	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.");
-	}
-
-	// set timer
+	// init timers
+	init_quantum_timer(quantum_usecs);
+	init_sleep_timer();
+	// set quantum timer
 	if (setitimer(ITIMER_VIRTUAL, &quantum_timer, NULL))
 	{
-		print_err(SYS_ERR_CODE, "timer set failed.");
+		print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 	}
-
 	// create main thread
-	shared_ptr<Thread> new_thread = std::make_shared<Thread>(Thread());
-	threads[new_thread->get_id()] = new_thread;
-	running_thread = new_thread;
-	running_thread->increase_quantums();
-
+	create_main_thread();
+	// init blocked signals set
 	init_sigs_to_block();
 	unblock_signals();
 	return 0;
@@ -294,9 +342,9 @@ int uthread_spawn(void (*f)(void))
 	block_signals();
 	if (threads.size() == MAX_THREAD_NUM)
 	{
-		return (print_err(THREAD_ERR_CODE, "max number of threads exceeded."));
+		return (print_err(THREAD_ERR_CODE, MAX_THREAD_MSG));
 	}
-
+	// create new thread
 	shared_ptr<Thread> new_thread = std::make_shared<Thread>(Thread(f, get_min_id()));
 	threads[new_thread->get_id()] = new_thread;
 	ready_threads.push_back(new_thread);
@@ -317,35 +365,39 @@ int uthread_spawn(void (*f)(void))
  * thread is terminated, the function does not return.
 */
 int uthread_terminate(int tid)
-{ //TODO: consider an error and memory deallocation
+{
 	block_signals();
-	if (threads.find(tid) == threads.end())
+	if (is_id_invalid(tid))
 	{
-		unblock_signals();
-		return print_err(THREAD_ERR_CODE, "invalid thread id.");
+		return print_err(THREAD_ERR_CODE, INVALID_ID_MSG);
 	}
-	if (tid == 0)
+	if (is_id_nonexisting(tid))
+	{
+		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
+	}
+	//TODO: consider an error and memory deallocation
+	if (is_main_thread(tid))
 	{
 		exit(0);
 	}
-	if (running_thread->get_id() == tid)
+	// terminate running thread
+	if (is_running_thread(tid))
 	{
 		threads.erase(tid);
-		sleeping_threads.remove(tid);
-		ready_to_running(1);
+		ready_to_running(true);
 	}
+		// terminate non running thread
 	else
 	{
 		if (does_exist(ready_threads, tid))
 		{
 			ready_threads.remove(threads[tid]);
+		}
+		else
+		{
 			sleeping_threads.remove(tid);
 		}
-
-
 		threads.erase(tid);
-		sleeping_threads.remove(tid);
-
 	}
 	unblock_signals();
 }
@@ -363,29 +415,28 @@ int uthread_terminate(int tid)
 int uthread_block(int tid)
 {
 	block_signals();
-	shared_ptr<Thread> to_delete;
-	// don't allow blocking of the main thread (or a non existing one)
-	if (tid == 0 || threads.find(tid) == threads.end())
+	if (is_id_invalid(tid))
 	{
-		return print_err(THREAD_ERR_CODE, "unable to block non-existing/main thread");
+		return print_err(THREAD_ERR_CODE, INVALID_ID_MSG);
 	}
-
-
-
+	if (is_id_nonexisting(tid))
+	{
+		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
+	}
+	if (is_main_thread(tid))
+	{
+		return print_err(THREAD_ERR_CODE, BLOCK_MAIN_MSG);
+	}
 
 	// if thread is the running thread, run the next ready thread
-	if (threads[tid] == running_thread)
+	if (is_running_thread(tid))
 	{
-		ready_to_running(1);
+		unblock_signals();
+		ready_to_running(true);
 	}
+
+	shared_ptr<Thread> to_delete = get_ready_thread(tid);
 	// block thread (remove from ready)
-	for (std::list<shared_ptr<Thread>>::iterator it = ready_threads.begin(); it != ready_threads.end(); ++it)
-	{
-		if ((*it)->get_id() == tid)
-		{
-			to_delete = *it;
-		}
-	}
 	if (to_delete != nullptr)
 	{
 		ready_threads.remove(to_delete);
@@ -405,13 +456,17 @@ int uthread_block(int tid)
 int uthread_resume(int tid)
 {
 	block_signals();
-	if (threads.find(tid) == threads.end())
+	if (is_id_invalid(tid))
 	{
-		return print_err(THREAD_ERR_CODE, "no such thread exsits.");
+		return print_err(THREAD_ERR_CODE, INVALID_ID_MSG);
+	}
+	if (is_id_nonexisting(tid))
+	{
+		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
 	}
 	shared_ptr<Thread> curr_thread = threads[tid];
 	// if thread to resume is not running or already ready
-	if (does_exist(ready_threads, tid) || (running_thread->get_id() != tid))
+	if (!does_exist(ready_threads, tid) && !is_running_thread(tid))
 	{
 		ready_threads.push_back(curr_thread);
 	}
@@ -428,31 +483,29 @@ int uthread_resume(int tid)
  * should be made.
  * Return value: On success, return 0. On failure, return -1.
 */
-int uthread_sleep(int usec)
+int uthread_sleep(unsigned int usec)
 {
 	block_signals();
-	if(usec<0){
-		unblock_signals();
-		return print_err(SYS_ERR_CODE, "invalid time value");
-	}
-//	else if (usec == 0){
-//		unblock_signals();
-//		return 0;
-//	}
-	// don't allow main thread sleeping
-	if (running_thread->get_id() == 0)
+	if (is_time_invalid(usec))
 	{
-		return print_err(THREAD_ERR_CODE, "main thread can't be put to sleep.");
+		return print_err(THREAD_ERR_CODE, NEG_TIME_MSG);
 	}
-	// update sleep_timer values
-	sleep_timer.it_value.tv_sec = usec / 1000000;
-	sleep_timer.it_value.tv_usec = usec % 1000000;
-	if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
+	if (is_main_thread(running_thread->get_id()))
 	{
-		print_err(SYS_ERR_CODE, "setting timer failed.");
+		return print_err(THREAD_ERR_CODE, BLOCK_MAIN_MSG);
+	}
+	if (sleeping_threads.peek() == nullptr)
+	{
+		// update sleep_timer values
+		sleep_timer.it_value.tv_sec = usec / 1000000;
+		sleep_timer.it_value.tv_usec = usec % 1000000;
+		if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
+		{
+			print_err(SYS_ERR_CODE, TIMER_SET_MSG);
+		}
 	}
 	sleeping_threads.add(running_thread->get_id(), calc_wake_up_timeval(usec));
-	ready_to_running(1);
+	ready_to_running(true);
 	unblock_signals();
 	return 0;
 }
@@ -492,10 +545,13 @@ int uthread_get_total_quantums()
 */
 int uthread_get_quantums(int tid)
 {
-	// check for non existing tid
-	if (threads.find(tid) == threads.end())
+	if (is_id_invalid(tid))
 	{
-		return -1;
+		return print_err(THREAD_ERR_CODE, INVALID_ID_MSG);
+	}
+	if (is_id_nonexisting(tid))
+	{
+		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
 	}
 	return threads[tid]->get_quantums();
 }
