@@ -1,27 +1,47 @@
 tomka, alonemanuel
 Tom Kalir (316426485), Alon Emanuel (205894058)
-EX: 1
+EX: 2
 
 FILES:
-myfile.c -- a file with some code
-myfile.h -- a file with some headers
+sleeping_threads_list.h -- a file with some code
+sleeping_threads_list.cpp -- a file with some code
+thread.h -- a file with some code
+thread.cpp -- a file with some code
+uthreads.cpp -- a file with some code
 
 REMARKS:
 
 ANSWERS:
 
-Assignment 1:
+Question 1:
 
-After running the file there are two options -
 
-1. If you supply a single argument, the program creates a directory called 'Welcome',
-and inside 'Welcome' it creates another directory called 'To', and inside of that it creates a file
-called 'OS2018'.
-It then opens the file and writes the following text into it:
-"[username]
-If you haven't read the course guidelines yet --- do it right now!
-[supplied argument]"
-It then closes the file and deletes it, and then goes on to delete the directories in a reverse order.
+Question 2:
 
-2. Else, it prints the following error:
-"Error. The program should receive a single argument. Exiting."
+Advantages:
+1. Memory and resource management is made easier and more beneficial -
+when a tab is closed (or minimized\hidden), its resources can
+be freed or shared among other currently-active processes.
+2. Bugs and crashes are focused to the specific tab (=process), thus giving 
+the browser a more stable performance that can 'survive' tab-specific errors.
+
+Disadvantages:
+1. As opposed to user-level threads, each process creates a lot of overhead
+and is considered to be slow and inefficient.
+2. Although resource management is indeed efficient in chrome's implementation,
+but resource *use* and demand is greater, due to the need to store data for each of these
+processes (which are not 'hidden' from the OS like user-level threads are).
+
+
+Question 3.a:
+
+Question 3.b:
+
+Question 3.c:
+
+Question 4:
+As described in "man itimer":
+Real time 'passes' as real-life time, 
+while virtual time passes only when the process is executing.
+We use *virtual* time in our quantum timer - it sends a signal when a virtual quantum has passed.
+We use *real* time in our sleep timer - it send a signal when a real time 'unit' has passed.
