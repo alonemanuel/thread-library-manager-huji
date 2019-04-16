@@ -1,7 +1,6 @@
-// Includes //
-#include "uthreads.h"
-#include "thread.h"
-#include "sleeping_threads_list.h"
+
+#include "../uthreads.h"
+#include "../thread.h"
 #include <list>
 #include <unordered_map>
 #include <algorithm>
@@ -10,6 +9,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <memory>
+#include "../sleeping_threads_list.h"
 
 // Constants //
 #define SYS_ERR_CODE 0
@@ -18,63 +18,53 @@
 #define STACK_SIZE 4096 /* stack size per thread (in bytes) */
 #define TIMER_SET_MSG "setting the timer has failed."
 #define INVALID_ID_MSG "thread ID must be between 0 and "+ to_string(MAX_THREAD_NUM) + "."
-#define ID_NONEXIST_MSG "thread with such ID does not exist."
-#define BLOCK_MAIN_MSG "main thread cannot be blocked."
-#define NEG_TIME_MSG "time must be non-negative."
-#define MAX_THREAD_MSG "max number of threads exceeded."
+/* External interface */
 
+
+
+#define ID_NONEXIST_MSG "thread with such ID does not exist."
+
+#define BLOCK_MAIN_MSG "main thread cannot be blocked."
+
+#define NEG_TIME_MSG "time must be non-negative."
+
+#define MAX_THREAD_MSG "max number of threads exceeded."
 // Using //
+
 using std::cout;
 using std::endl;
+
 using std::shared_ptr;
 
-// Static Variables //
 
-/**
- * @brief total quantums already ran
- */
+// Static Variables //
 int total_quantums;
 
-/**
- * @brief environment buffer
- */
 sigjmp_buf env[2];
 
-/**
- * @brief signals to block
- */
 sigset_t sigs_to_block;
 
 /**
  * @brief map of all existing threads, with their tid as key.
  */
 std::unordered_map<int, shared_ptr<Thread>> threads;
-
 /**
  * @brief list of all ready threads.
  */
 std::list<shared_ptr<Thread>> ready_threads;
-
 /**
  * @brief the current running thread.
  */
 shared_ptr<Thread> running_thread;
-
 /**
  * @brief list of all current sleeping threads (id's).
  */
 SleepingThreadsList sleeping_threads;
-
 /**
  * @brief timers.
  */
-std::list<int> blocked_threads;
 
-/**
- * @brief timers.
- */
 struct itimerval quantum_timer, sleep_timer;
-
 /**
  * @brief sigactions.
  */
@@ -83,27 +73,24 @@ struct sigaction quantum_sa, sleep_sa;
 
 // Helper Functions //
 
-/**
- * @brief block signals set in sig_block
- */
+
 void block_signals()
 {
+
 	sigprocmask(SIG_BLOCK, &sigs_to_block, NULL);
+
 }
 
-/**
- * @brief unblock signals.
- */
 void unblock_signals()
 {
 	sigprocmask(SIG_UNBLOCK, &sigs_to_block, NULL);
+
 }
 
-/**
- * @brief get minimal id in thread map.
- */
 unsigned int get_min_id()
 {
+	block_signals();
+
 	for (unsigned int i = 0; i < threads.size(); ++i)
 	{
 		if (threads.find(i) == threads.end())
@@ -112,7 +99,9 @@ unsigned int get_min_id()
 			return i;
 		}
 	}
+	unblock_signals();
 	return (unsigned int) threads.size();
+
 }
 
 /**
@@ -122,6 +111,7 @@ unsigned int get_min_id()
  */
 int print_err(int code, string text)
 {
+	block_signals();
 	string prefix;
 	switch (code)
 	{
@@ -132,58 +122,41 @@ int print_err(int code, string text)
 			prefix = "thread library error: ";
 			break;
 	}
-	cerr << prefix << text << endl;
+	cout << prefix << text << endl;    // TODO change to cout
 	if (code == SYS_ERR_CODE)
 	{
-		exit(1);
+		exit(1);    // TODO we need to return on failures, but exit makes it irrelevant
 	}
 	else
 	{
+		unblock_signals();
 		return -1;
 	}
+
 }
 
-/**
- * @brief set timer for next sleeping thread.
- */
 void next_sleeping()
 {
-	timeval curr_time;
+	block_signals();
 	wake_up_info *last_sleeping = sleeping_threads.peek();
-	if (last_sleeping != nullptr)		// are there anymore threads sleeping?
+	if (last_sleeping != nullptr)
 	{
-		gettimeofday(&curr_time, NULL);
 		// update sleep_timer values
-		__time_t delt_sec = -curr_time.tv_sec + last_sleeping->awaken_tv.tv_sec;
-		__time_t delt_usec = -curr_time.tv_usec + last_sleeping->awaken_tv.tv_usec;
-		if ((delt_sec < 0) || (delt_usec < 0))
-		{
-			raise(SIGALRM);
-		}
-		else
-		{
-			sleep_timer.it_value.tv_sec = delt_sec;
-			sleep_timer.it_value.tv_usec = delt_usec;
-			if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
-			{
-				print_err(SYS_ERR_CODE, TIMER_SET_MSG);
-			}
-		}
-	}
-	else						// no one else is sleeping?
-	{
-		sleep_timer.it_value.tv_sec = 0;
-		sleep_timer.it_value.tv_usec = 0;
+		sleep_timer.it_value.tv_sec = last_sleeping->awaken_tv.tv_sec;
+		sleep_timer.it_value.tv_usec = last_sleeping->awaken_tv.tv_usec;
 		if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
 		{
 			print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 		}
 	}
+	else
+	{
+		sleep_timer.it_value.tv_sec = 0;
+		sleep_timer.it_value.tv_usec = 0;
+	}
+	unblock_signals();
 }
 
-/**
- * @brief creates the main thread of the process.
- */
 void create_main_thread()
 {
 	shared_ptr<Thread> new_thread = std::make_shared<Thread>(Thread());
@@ -192,39 +165,21 @@ void create_main_thread()
 	running_thread->increase_quantums();
 }
 
-/**
- * @brief returns true iff tid exists in ready threads.
- */
 bool does_exist(std::list<shared_ptr<Thread>> lst, int tid)
 {
+	block_signals();
 	for (std::list<shared_ptr<Thread>>::iterator it = lst.begin(); it != lst.end(); ++it)
 	{
 		if ((*it)->get_id() == tid)
 		{
+			unblock_signals();
 			return true;
 		}
 	}
+	unblock_signals();
 	return false;
 }
 
-/**
- * @brief return true iff tid is a blocked thread.
- */
-bool does_blocked_exist(std::list<int> lst, int tid)
-{
-	for (std::list<int>::iterator it = lst.begin(); it != lst.end(); ++it)
-	{
-		if (*it == tid)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
- * @brief inits the set of blocked.
- */
 void init_sigs_to_block()
 {
 	sigemptyset(&sigs_to_block);
@@ -232,16 +187,16 @@ void init_sigs_to_block()
 	sigaddset(&sigs_to_block, SIGVTALRM);
 }
 
-/**
- * @brief calculates wake up time.
- */
+
 timeval calc_wake_up_timeval(int usecs_to_sleep)
 {
+	block_signals();
 	timeval now, time_to_sleep, wake_up_timeval;
 	gettimeofday(&now, nullptr);
 	time_to_sleep.tv_sec = usecs_to_sleep / 1000000;
 	time_to_sleep.tv_usec = usecs_to_sleep % 1000000;
 	timeradd(&now, &time_to_sleep, &wake_up_timeval);
+	unblock_signals();
 	return wake_up_timeval;
 }
 
@@ -250,9 +205,11 @@ timeval calc_wake_up_timeval(int usecs_to_sleep)
  */
 void ready_to_running(bool is_blocking = false)
 {
+	block_signals();
 	int ret_val = sigsetjmp(running_thread->env[0], 1);
 	if (ret_val == 1)
 	{
+		unblock_signals();
 		return;
 	}
 	if (!is_blocking)
@@ -271,12 +228,10 @@ void ready_to_running(bool is_blocking = false)
 	{
 		print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 	}
+	unblock_signals();
 	siglongjmp(running_thread->env[0], 1);
 }
 
-/**
- * @brief gets ready thread with given tid.
- */
 shared_ptr<Thread> get_ready_thread(int tid)
 {
 	for (std::list<shared_ptr<Thread>>::iterator it = ready_threads.begin(); it != ready_threads.end(); ++it)
@@ -289,33 +244,23 @@ shared_ptr<Thread> get_ready_thread(int tid)
 	return nullptr;
 }
 
-/**
- * @brief return true iff tid is invalid.
- */
+
 bool is_id_invalid(int tid)
 {
 	return ((tid < 0) || (tid > MAX_THREAD_NUM));
+
 }
 
-/**
- * @brief returns true iff tid exists.
- */
 bool is_id_nonexisting(int tid)
 {
 	return threads.find(tid) == threads.end();
 }
 
-/**
- * @brief returns true iff tid is main thread.
- */
 bool is_main_thread(int tid)
 {
 	return tid == 0;
 }
 
-/**
- * @brief returns true iff time is invalid.
- */
 bool is_time_invalid(int time)
 {
 	return time < 0;
@@ -339,14 +284,11 @@ void quantum_handler(int sig)
 void sleep_handler(int sig)
 {
 	block_signals();
-	int tid = sleeping_threads.peek()->id;
+	cout << "woke up" << endl;
+
+	uthread_resume(sleeping_threads.peek()->id);
 	sleeping_threads.pop();
 	next_sleeping();
-	if (!does_blocked_exist(blocked_threads, tid))
-	{
-		ready_threads.push_back(threads[tid]);
-	}
-
 	unblock_signals();
 }
 
@@ -409,7 +351,6 @@ int uthread_init(int quantum_usecs)
 	// create main thread
 	create_main_thread();
 	// init blocked signals set
-	unblock_signals();
 	return 0;
 }
 
@@ -464,6 +405,7 @@ int uthread_terminate(int tid)
 		unblock_signals();
 		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
 	}
+	//TODO: consider an error and memory deallocation
 	if (is_main_thread(tid))
 	{
 		unblock_signals();
@@ -481,11 +423,9 @@ int uthread_terminate(int tid)
 		if (does_exist(ready_threads, tid))
 		{
 			ready_threads.remove(threads[tid]);
-			threads.erase(tid);
 		}
 		else
 		{
-
 			if (sleeping_threads.peek() != nullptr)
 			{
 				int curr_sleeper_id = sleeping_threads.peek()->id;
@@ -532,9 +472,7 @@ int uthread_block(int tid)
 	if (is_running_thread(tid))
 	{
 		unblock_signals();
-		blocked_threads.push_back(tid);
 		ready_to_running(true);
-		return 0;
 	}
 
 	shared_ptr<Thread> to_delete = get_ready_thread(tid);
@@ -543,7 +481,6 @@ int uthread_block(int tid)
 	{
 		ready_threads.remove(to_delete);
 	}
-	blocked_threads.push_back(tid);
 	unblock_signals();
 	return 0;
 }
@@ -571,17 +508,10 @@ int uthread_resume(int tid)
 	// if thread to resume is not running or already ready
 	if (!does_exist(ready_threads, tid) && !is_running_thread(tid))
 	{
-		blocked_threads.remove(tid);
-		if (!sleeping_threads.does_exist(tid))
-		{
-			ready_threads.push_back(curr_thread);
-		}
-
-
-
+		ready_threads.push_back(curr_thread);
 	}
-		unblock_signals();
-		return 0;
+	unblock_signals();
+	return 0;
 }
 
 

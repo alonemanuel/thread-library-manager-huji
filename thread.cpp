@@ -33,16 +33,12 @@ address_t translate_address(address_t addr)
 Thread::Thread(void (*f)(void), int id) : _id(id), _state(READY), _stack_size(STACK_SIZE), _quantums(0), func(f)
 {
 	stack = new char[STACK_SIZE];
-//	if (num_of_threads)
-//	{
-//	cout << "Creating thread!" << endl;
 	sp = (address_t) stack + STACK_SIZE - sizeof(address_t);
 	pc = (address_t) f;
 	sigsetjmp(env[0], 1);
 	(env[0]->__jmpbuf)[JB_SP] = translate_address(sp);
 	(env[0]->__jmpbuf)[JB_PC] = translate_address(pc);
 	sigemptyset(&env[0]->__saved_mask);
-//	}
 	num_of_threads++;
 }
 

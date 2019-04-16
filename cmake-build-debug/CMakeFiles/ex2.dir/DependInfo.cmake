@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/cs/usr/alonemanuel/OS/ex2/sleeping_threads_list.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o"
-  "/cs/usr/alonemanuel/OS/ex2/t4.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/ex2.dir/t4.cpp.o"
-  "/cs/usr/alonemanuel/OS/ex2/thread.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/ex2.dir/thread.cpp.o"
-  "/cs/usr/alonemanuel/OS/ex2/uthreads.cpp" "/cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/ex2.dir/uthreads.cpp.o"
+  "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/NonLib/t4.cpp" "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles/ex2.dir/NonLib/t4.cpp.o"
+  "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/sleeping_threads_list.cpp" "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o"
+  "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/thread.cpp" "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles/ex2.dir/thread.cpp.o"
+  "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/uthreads.cpp" "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles/ex2.dir/uthreads.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

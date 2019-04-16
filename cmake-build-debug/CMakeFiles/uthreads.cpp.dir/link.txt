@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/uthreads.cpp.dir/sleeping_threads_list.cpp.o CMakeFiles/uthreads.cpp.dir/thread.cpp.o  -o uthreads.cpp 

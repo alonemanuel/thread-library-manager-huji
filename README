@@ -23,14 +23,14 @@ the threads are perceived to be running simultaneously.
 
 Question 2:
 
-Advantages:
+Advantages-
 1. Memory and resource management is made easier and more beneficial -
 when a tab is closed (or minimized\hidden), its resources can
 be freed or shared among other currently-active processes.
-2. Bugs and crashes are focused to the specific tab (=process), thus giving 
+2. Bugs and crashes are focused to the specific tab (=process), thus giving
 the browser a more stable performance that can 'survive' tab-specific errors.
 
-Disadvantages:
+Disadvantages-
 1. As opposed to user-level threads, each process creates a lot of overhead
 and is considered to be slow and inefficient.
 2. Although resource management is indeed efficient in chrome's implementation,
@@ -41,15 +41,21 @@ processes (which are not 'hidden' from the OS like user-level threads are).
 
 Question 3:
 
-When hitting the keyboard keys to enter "shotrell", interrupts are sent to the OS, telling it that a key
-was pressed. It then acts according to the handler it set for those interrupts.
-When sending the command "ps -A", we can see the long list of sigactions that are done, connecting different signals
-to their appropriate handlers. For instance, SIGABRT is handled by some specific handler.
-At the end of the 'kill pid' statement, we see a SIGTERM signal, whose job is to terminate the process in a 'supervised' way,
-meaning it's threads can exit correctly.
+The act of using the keyboard in order to write commands to the computer's shell, is a process by itself.
+When pressing each of the keys to enter "shotwell", external interrupts are sent from the keyboard to the OS,
+which then acts according to the handler it set for those interrupts.
+When the "ENTER" key is pressed, as we mentioned, an external interrupt is sent by the keyboard to the OS,
+which now causes the OS to switch the control back to the shell.
+When sending the command "ps -A", we can see the long list of sigactions that were done, connecting different
+signals to their appropriate handlers. For instance, SIGABRT is handled by some specific handler.
+At the end of the "kill pid" statement, which acts as the input to the shell, a request is sent by the OS to
+create a trap and sends a SIGKILL signal to the process that was running Showtell.
+As we know, this process is then terminated with a SIGTERM signal, whose job is to terminate the process in a
+'supervised' way, meaning it's threads can exit correctly.
 
 
 Question 4:
+
 As described in "man itimer":
 Real time 'passes' as real-life time, 
 while virtual time passes only when the process is executing.

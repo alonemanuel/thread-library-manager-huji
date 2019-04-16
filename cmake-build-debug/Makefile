@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/APP/jetbrains/clion/2018.2.1/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /cygdrive/c/Users/aeder/.CLion2018.2/system/cygwin_cmake/bin/cmake.exe
 
 # The command to remove a file.
-RM = /usr/local/APP/jetbrains/clion/2018.2.1/bin/cmake/linux/bin/cmake -E remove -f
+RM = /cygdrive/c/Users/aeder/.CLion2018.2/system/cygwin_cmake/bin/cmake.exe -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cs/usr/alonemanuel/OS/ex2
+CMAKE_SOURCE_DIR = "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cs/usr/alonemanuel/OS/ex2/cmake-build-debug
+CMAKE_BINARY_DIR = "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /cs/usr/alonemanuel/OS/ex2/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/APP/jetbrains/clion/2018.2.1/bin/cmake/linux/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/cygdrive/c/Users/aeder/.CLion2018.2/system/cygwin_cmake/bin/cmake.exe -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/local/APP/jetbrains/clion/2018.2.1/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/cygdrive/c/Users/aeder/.CLion2018.2/system/cygwin_cmake/bin/cmake.exe -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles /cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles" "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles/progress.marks"
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/alonemanuel/OS/ex2/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/cygdrive/e/alon_emanuel_drive/School/Year 2/Semester_2/67808_OS/Exercises/ex2/ex2/cmake-build-debug/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -123,6 +123,33 @@ ex2/fast:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/build
 .PHONY : ex2/fast
 
+NonLib/t4.o: NonLib/t4.cpp.o
+
+.PHONY : NonLib/t4.o
+
+# target to build an object file
+NonLib/t4.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/NonLib/t4.cpp.o
+.PHONY : NonLib/t4.cpp.o
+
+NonLib/t4.i: NonLib/t4.cpp.i
+
+.PHONY : NonLib/t4.i
+
+# target to preprocess a source file
+NonLib/t4.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/NonLib/t4.cpp.i
+.PHONY : NonLib/t4.cpp.i
+
+NonLib/t4.s: NonLib/t4.cpp.s
+
+.PHONY : NonLib/t4.s
+
+# target to generate assembly for a file
+NonLib/t4.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/NonLib/t4.cpp.s
+.PHONY : NonLib/t4.cpp.s
+
 sleeping_threads_list.o: sleeping_threads_list.cpp.o
 
 .PHONY : sleeping_threads_list.o
@@ -149,33 +176,6 @@ sleeping_threads_list.s: sleeping_threads_list.cpp.s
 sleeping_threads_list.cpp.s:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.s
 .PHONY : sleeping_threads_list.cpp.s
-
-t4.o: t4.cpp.o
-
-.PHONY : t4.o
-
-# target to build an object file
-t4.cpp.o:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.o
-.PHONY : t4.cpp.o
-
-t4.i: t4.cpp.i
-
-.PHONY : t4.i
-
-# target to preprocess a source file
-t4.cpp.i:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.i
-.PHONY : t4.cpp.i
-
-t4.s: t4.cpp.s
-
-.PHONY : t4.s
-
-# target to generate assembly for a file
-t4.cpp.s:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.s
-.PHONY : t4.cpp.s
 
 thread.o: thread.cpp.o
 
@@ -238,14 +238,14 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
 	@echo "... ex2"
+	@echo "... edit_cache"
+	@echo "... NonLib/t4.o"
+	@echo "... NonLib/t4.i"
+	@echo "... NonLib/t4.s"
 	@echo "... sleeping_threads_list.o"
 	@echo "... sleeping_threads_list.i"
 	@echo "... sleeping_threads_list.s"
-	@echo "... t4.o"
-	@echo "... t4.i"
-	@echo "... t4.s"
 	@echo "... thread.o"
 	@echo "... thread.i"
 	@echo "... thread.s"
