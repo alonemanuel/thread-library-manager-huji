@@ -5,6 +5,7 @@
 
 #include <cstdio>
 #include "uthreads.h"
+#include <iostream>
 
 #define GRN "\e[32m"
 #define RED "\x1B[31m"
@@ -32,7 +33,6 @@ void thread()
     //uthread_sync(next_thread());
 
     //uthread_sync(next_thread());
-
     uthread_block(uthread_get_tid());
 
     for (int i = 0; i < 50; i++)

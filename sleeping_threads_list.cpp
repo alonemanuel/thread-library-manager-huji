@@ -31,6 +31,15 @@ void SleepingThreadsList::add(int thread_id, timeval wakeup_tv) {
 	}
 }
 
+bool SleepingThreadsList::does_exist(int tid){
+	for (deque<wake_up_info>::iterator it = sleeping_threads.begin(); it!=sleeping_threads.end();++it){
+		if(it->id == tid){
+			return true;
+		}
+	}
+	return false;
+}
+
 void SleepingThreadsList::remove(int tid){
 	for (deque<wake_up_info>::iterator it = sleeping_threads.begin(); it != sleeping_threads.end(); ++it){
 		if(it->id == tid){

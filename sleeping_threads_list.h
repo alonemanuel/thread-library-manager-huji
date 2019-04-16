@@ -32,6 +32,8 @@ public:
 
 	void remove(int tid);
 
+	bool does_exist(int tid);
+
 	/*
 	 * Description: This method removes the thread at the top of this list.
 	 * If the list is empty, it does nothing.

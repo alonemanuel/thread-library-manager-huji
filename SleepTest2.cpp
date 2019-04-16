@@ -104,6 +104,7 @@ int main() {
         }
         if((52<= uthread_get_total_quantums()) && (uthread_get_total_quantums()<=53))
         {
+            std::cout<<uthread_get_total_quantums()<<std::endl;
             std::cout<< " end of the program\n";
             uthread_terminate(0);
         }
