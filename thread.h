@@ -30,9 +30,9 @@ class Thread
 private:
 	static int num_of_threads;
 protected:
+	int _id;
 	int _state;
 	int _stack_size;
-	int _id;
 	int _quantums;
 
 public:

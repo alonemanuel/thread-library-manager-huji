@@ -73,8 +73,10 @@ struct sigaction quantum_sa, sleep_sa;
 
 // Helper Functions //
 
+
 void block_signals()
 {
+
 	sigprocmask(SIG_BLOCK, &sigs_to_block, NULL);
 
 }
@@ -89,7 +91,7 @@ unsigned int get_min_id()
 {
 	block_signals();
 
-	for (int i = 0; i < threads.size(); ++i)
+	for (unsigned int i = 0; i < threads.size(); ++i)
 	{
 		if (threads.find(i) == threads.end())
 		{
@@ -98,7 +100,7 @@ unsigned int get_min_id()
 		}
 	}
 	unblock_signals();
-	return threads.size();
+	return (unsigned int) threads.size();
 
 }
 
@@ -120,7 +122,7 @@ int print_err(int code, string text)
 			prefix = "thread library error: ";
 			break;
 	}
-	cerr << prefix << text << endl;
+	cout << prefix << text << endl;    // TODO change to cout
 	if (code == SYS_ERR_CODE)
 	{
 		exit(1);    // TODO we need to return on failures, but exit makes it irrelevant
@@ -131,6 +133,28 @@ int print_err(int code, string text)
 		return -1;
 	}
 
+}
+
+void next_sleeping()
+{
+	block_signals();
+	wake_up_info *last_sleeping = sleeping_threads.peek();
+	if (last_sleeping != nullptr)
+	{
+		// update sleep_timer values
+		sleep_timer.it_value.tv_sec = last_sleeping->awaken_tv.tv_sec;
+		sleep_timer.it_value.tv_usec = last_sleeping->awaken_tv.tv_usec;
+		if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
+		{
+			print_err(SYS_ERR_CODE, TIMER_SET_MSG);
+		}
+	}
+	else
+	{
+		sleep_timer.it_value.tv_sec = 0;
+		sleep_timer.it_value.tv_usec = 0;
+	}
+	unblock_signals();
 }
 
 void create_main_thread()
@@ -158,11 +182,9 @@ bool does_exist(std::list<shared_ptr<Thread>> lst, int tid)
 
 void init_sigs_to_block()
 {
-	block_signals();
 	sigemptyset(&sigs_to_block);
 	sigaddset(&sigs_to_block, SIGALRM);
 	sigaddset(&sigs_to_block, SIGVTALRM);
-	unblock_signals();
 }
 
 
@@ -262,19 +284,11 @@ void quantum_handler(int sig)
 void sleep_handler(int sig)
 {
 	block_signals();
+	cout << "woke up" << endl;
+
 	uthread_resume(sleeping_threads.peek()->id);
 	sleeping_threads.pop();
-	wake_up_info *last_sleeping = sleeping_threads.peek();
-	if (last_sleeping != nullptr)
-	{
-		// update sleep_timer values
-		sleep_timer.it_value.tv_sec = last_sleeping->awaken_tv.tv_sec / 1000000;
-		sleep_timer.it_value.tv_usec = last_sleeping->awaken_tv.tv_usec % 1000000;
-		if (setitimer(ITIMER_REAL, &sleep_timer, NULL))
-		{
-			print_err(SYS_ERR_CODE, TIMER_SET_MSG);
-		}
-	}
+	next_sleeping();
 	unblock_signals();
 }
 
@@ -286,7 +300,7 @@ void init_quantum_timer(int quantum_usecs)
 	quantum_sa.sa_handler = &quantum_handler;
 	if (sigaction(SIGVTALRM, &quantum_sa, NULL) < 0)
 	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.");
+		print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 	}
 }
 
@@ -294,10 +308,12 @@ void init_sleep_timer()
 {
 	sleep_timer.it_value.tv_sec = 0;
 	sleep_timer.it_value.tv_usec = 0;
+	sleep_timer.it_interval.tv_usec = 0;
+	sleep_timer.it_interval.tv_usec = 0;
 	sleep_sa.sa_handler = &sleep_handler;
 	if (sigaction(SIGALRM, &sleep_sa, NULL) < 0)
 	{
-		print_err(SYS_ERR_CODE, "timer initialization failed.");
+		print_err(SYS_ERR_CODE, TIMER_SET_MSG);
 	}
 
 }
@@ -315,6 +331,7 @@ void init_sleep_timer()
 */
 int uthread_init(int quantum_usecs)
 {
+	init_sigs_to_block();
 	block_signals();
 	// quantum_usecs cannot be negative
 	if (is_time_invalid(quantum_usecs))
@@ -334,8 +351,6 @@ int uthread_init(int quantum_usecs)
 	// create main thread
 	create_main_thread();
 	// init blocked signals set
-	init_sigs_to_block();
-	unblock_signals();
 	return 0;
 }
 
@@ -382,15 +397,18 @@ int uthread_terminate(int tid)
 	block_signals();
 	if (is_id_invalid(tid))
 	{
+		unblock_signals();
 		return print_err(THREAD_ERR_CODE, INVALID_ID_MSG);
 	}
 	if (is_id_nonexisting(tid))
 	{
+		unblock_signals();
 		return print_err(THREAD_ERR_CODE, ID_NONEXIST_MSG);
 	}
 	//TODO: consider an error and memory deallocation
 	if (is_main_thread(tid))
 	{
+		unblock_signals();
 		exit(0);
 	}
 	// terminate running thread
@@ -408,11 +426,20 @@ int uthread_terminate(int tid)
 		}
 		else
 		{
-			sleeping_threads.remove(tid);
+			if (sleeping_threads.peek() != nullptr)
+			{
+				int curr_sleeper_id = sleeping_threads.peek()->id;
+				sleeping_threads.remove(tid);
+				if (curr_sleeper_id == tid)
+				{
+					next_sleeping();
+				}
+			}
+			threads.erase(tid);
 		}
-		threads.erase(tid);
 	}
 	unblock_signals();
+	return 0;
 }
 
 
@@ -501,14 +528,23 @@ int uthread_sleep(unsigned int usec)
 	block_signals();
 	if (is_time_invalid(usec))
 	{
+		unblock_signals();
 		return print_err(THREAD_ERR_CODE, NEG_TIME_MSG);
 	}
 	if (is_main_thread(running_thread->get_id()))
 	{
+		unblock_signals();
 		return print_err(THREAD_ERR_CODE, BLOCK_MAIN_MSG);
+	}
+	if (usec == 0)
+	{
+		ready_to_running();
+		unblock_signals();
+		return 0;
 	}
 	if (sleeping_threads.peek() == nullptr)
 	{
+
 		// update sleep_timer values
 		sleep_timer.it_value.tv_sec = usec / 1000000;
 		sleep_timer.it_value.tv_usec = usec % 1000000;
