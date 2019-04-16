@@ -150,32 +150,32 @@ sleeping_threads_list.cpp.s:
 	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/sleeping_threads_list.cpp.s
 .PHONY : sleeping_threads_list.cpp.s
 
-t8.o: t8.cpp.o
+t4.o: t4.cpp.o
 
-.PHONY : t8.o
+.PHONY : t4.o
 
 # target to build an object file
-t8.cpp.o:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t8.cpp.o
-.PHONY : t8.cpp.o
+t4.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.o
+.PHONY : t4.cpp.o
 
-t8.i: t8.cpp.i
+t4.i: t4.cpp.i
 
-.PHONY : t8.i
+.PHONY : t4.i
 
 # target to preprocess a source file
-t8.cpp.i:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t8.cpp.i
-.PHONY : t8.cpp.i
+t4.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.i
+.PHONY : t4.cpp.i
 
-t8.s: t8.cpp.s
+t4.s: t4.cpp.s
 
-.PHONY : t8.s
+.PHONY : t4.s
 
 # target to generate assembly for a file
-t8.cpp.s:
-	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t8.cpp.s
-.PHONY : t8.cpp.s
+t4.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2.dir/build.make CMakeFiles/ex2.dir/t4.cpp.s
+.PHONY : t4.cpp.s
 
 thread.o: thread.cpp.o
 
@@ -243,9 +243,9 @@ help:
 	@echo "... sleeping_threads_list.o"
 	@echo "... sleeping_threads_list.i"
 	@echo "... sleeping_threads_list.s"
-	@echo "... t8.o"
-	@echo "... t8.i"
-	@echo "... t8.s"
+	@echo "... t4.o"
+	@echo "... t4.i"
+	@echo "... t4.s"
 	@echo "... thread.o"
 	@echo "... thread.i"
 	@echo "... thread.s"

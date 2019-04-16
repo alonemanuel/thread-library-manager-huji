@@ -2,7 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/ex2.dir/uthreads.cpp.o"
   "CMakeFiles/ex2.dir/sleeping_threads_list.cpp.o"
   "CMakeFiles/ex2.dir/thread.cpp.o"
-  "CMakeFiles/ex2.dir/t8.cpp.o"
+  "CMakeFiles/ex2.dir/t4.cpp.o"
   "ex2.pdb"
   "ex2"
 )

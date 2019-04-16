@@ -6,11 +6,27 @@
 
 #IncludeRegexTransform: 
 
-/cs/usr/alonemanuel/OS/ex2/t8.cpp
-uthreads.h
-/cs/usr/alonemanuel/OS/ex2/uthreads.h
+/cs/usr/alonemanuel/OS/ex2/t4.cpp
 stdio.h
 -
+setjmp.h
+-
+signal.h
+-
+unistd.h
+-
+sys/time.h
+-
+stdlib.h
+-
+deque
+-
+list
+-
+assert.h
+-
+uthreads.h
+/cs/usr/alonemanuel/OS/ex2/uthreads.h
 iostream
 -
 

@@ -15,6 +15,11 @@ ANSWERS:
 
 Question 1:
 
+User level threads are unseen by the kernel, thus making them much more agile and lightweight.
+They give the user more control over scheduling and resource management.
+A good use for user-level threads in our example is the way we make scheduling decisions -
+each threads can receive a very small quantum, and due to the smart on-the-fly scheduling,
+the threads are perceived to be running simultaneously.
 
 Question 2:
 
@@ -33,11 +38,16 @@ but resource *use* and demand is greater, due to the need to store data for each
 processes (which are not 'hidden' from the OS like user-level threads are).
 
 
-Question 3.a:
 
-Question 3.b:
+Question 3:
 
-Question 3.c:
+When hitting the keyboard keys to enter "shotrell", interrupts are sent to the OS, telling it that a key
+was pressed. It then acts according to the handler it set for those interrupts.
+When sending the command "ps -A", we can see the long list of sigactions that are done, connecting different signals
+to their appropriate handlers. For instance, SIGABRT is handled by some specific handler.
+At the end of the 'kill pid' statement, we see a SIGTERM signal, whose job is to terminate the process in a 'supervised' way,
+meaning it's threads can exit correctly.
+
 
 Question 4:
 As described in "man itimer":
